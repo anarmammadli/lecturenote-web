@@ -1,0 +1,12 @@
+{
+  "name": "lecturenote-studio",
+  "version": "2.2.0",
+  "description": "LectureNote Studio with redesigned interactive Gemini study assistant",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^35.0.0"
+  }
+}

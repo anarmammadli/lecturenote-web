@@ -1,0 +1,3967 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>LectureNote Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07080f;
+      --bg-2: #0d0f1c;
+      --bg-3: #12162a;
+      --surface: rgba(20, 24, 46, 0.80);
+      --surface-hover: rgba(28, 34, 64, 0.90);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-active: rgba(245, 197, 24, 0.35);
+      --text: #f0ead6;
+      --text-muted: #7a7fa8;
+      --text-dim: #4a4f6a;
+      --gold: #f5c518;
+      --gold-dark: #c49a10;
+      --gold-glow: rgba(245, 197, 24, 0.12);
+      --teal: #4ecdc4;
+      --teal-glow: rgba(78, 205, 196, 0.10);
+      --red: #ff5e5b;
+      --green: #2ecc71;
+      --purple: #9b5cf6;
+      --orange: #ff8c42;
+      --blue: #3b82f6;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+      --font-head: 'DM Serif Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(245,197,24,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 20%, rgba(78,205,196,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 60% at 50% 100%, rgba(155,92,246,0.04) 0%, transparent 60%);
+      overflow: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(245,197,24,0.3); }
+
+    /* ── LAYOUT ── */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 268px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: linear-gradient(180deg, rgba(10,12,22,0.98) 0%, rgba(14,17,32,0.96) 100%);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245,197,24,0.3), transparent);
+    }
+
+    .sidebar-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 24px 16px;
+      gap: 6px;
+      overflow-y: auto;
+    }
+
+    /* Brand */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .brand-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      border-radius: 12px;
+      display: grid; place-items: center;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(245,197,24,0.25);
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: var(--font-head);
+      font-size: 17px;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .brand-tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Nav section label */
+    .nav-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 12px 10px 6px;
+    }
+
+    /* Nav item */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+    }
+    .nav-item:hover {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .nav-item.active {
+      background: var(--gold-glow);
+      border-color: var(--border-active);
+      color: var(--gold);
+    }
+    .nav-icon {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.04);
+      font-size: 15px;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .nav-item.active .nav-icon {
+      background: rgba(245,197,24,0.15);
+    }
+    .nav-text-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .nav-text-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      transition: color 0.2s;
+    }
+    .nav-item.active .nav-text-desc { color: rgba(245,197,24,0.55); }
+
+    /* Sidebar footer */
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+    }
+    #stateBadge { transition: all 0.3s; }
+    #assistantReadyBadge .status-dot { background: var(--text-dim); }
+
+    /* ── MAIN CONTENT ── */
+    .content {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 28px;
+      background: rgba(10,12,22,0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      font-family: var(--font-head);
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.15;
+    }
+    .topbar-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      max-width: 680px;
+    }
+    .topbar-stats {
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .stat-chip {
+      padding: 8px 14px;
+      border-radius: 99px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .stat-chip strong { color: var(--text); font-weight: 600; }
+
+    /* Scrollable content area */
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    /* ── PAGE VIEWS ── */
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    /* ── GRID LAYOUTS ── */
+    .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    .grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .stack { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── CARD / PANEL ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 18px 22px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 18px;
+      color: var(--text);
+    }
+    .card-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      padding: 5px 22px 0;
+      line-height: 1.55;
+    }
+    .card-body { padding: 18px 22px 22px; }
+
+    /* Hero card */
+    .hero-card {
+      background: linear-gradient(135deg, rgba(245,197,24,0.06) 0%, rgba(20,24,46,0.85) 40%, rgba(14,17,32,0.9) 100%);
+      border: 1px solid rgba(245,197,24,0.12);
+      border-radius: var(--radius);
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      right: -60px; bottom: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,197,24,0.07), transparent 65%);
+      pointer-events: none;
+    }
+    .hero-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .hero-orb {
+      width: 54px; height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(245,197,24,0.85), rgba(200,155,16,0.9));
+      display: grid; place-items: center;
+      font-size: 24px;
+      box-shadow: 0 8px 28px rgba(245,197,24,0.2);
+      flex-shrink: 0;
+    }
+    .hero-headline {
+      font-family: var(--font-head);
+      font-size: 24px;
+      line-height: 1.15;
+      color: var(--text);
+    }
+    .hero-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 18px;
+      max-width: 680px;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      padding: 5px 11px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+    }
+    .tag.gold { background: rgba(245,197,24,0.1); border-color: rgba(245,197,24,0.2); color: var(--gold); }
+    .tag.teal { background: rgba(78,205,196,0.1); border-color: rgba(78,205,196,0.2); color: var(--teal); }
+    .tag.ok { background: rgba(46,204,113,0.1); border-color: rgba(46,204,113,0.2); color: var(--green); }
+    .tag.warn { background: rgba(255,94,91,0.1); border-color: rgba(255,94,91,0.2); color: var(--red); }
+
+    /* Stats strip */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+    .stat-box .s-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .stat-box .s-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 6px;
+      line-height: 1.2;
+      font-family: var(--font-mono);
+    }
+    .stat-box .s-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    /* ── FORMS ── */
+    label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(7,8,15,0.6);
+      color: var(--text);
+      font-size: 13.5px;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(245,197,24,0.4);
+      box-shadow: 0 0 0 3px rgba(245,197,24,0.07);
+    }
+    select option { background: #0d0f1c; }
+    textarea { resize: vertical; }
+
+    /* ── BUTTONS ── */
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.18s;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    button:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; filter: none !important; }
+    button:not(:disabled):hover { transform: translateY(-1px); }
+
+    .btn { padding: 11px 18px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #0a0a00;
+      box-shadow: 0 4px 14px rgba(245,197,24,0.2);
+    }
+    .btn-gold:not(:disabled):hover { box-shadow: 0 6px 20px rgba(245,197,24,0.35); }
+
+    .btn-teal {
+      background: linear-gradient(135deg, #2bb8b0, var(--teal));
+      color: #001a19;
+      box-shadow: 0 4px 14px rgba(78,205,196,0.18);
+    }
+    .btn-red {
+      background: linear-gradient(135deg, #e04040, var(--red));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255,94,91,0.18);
+    }
+    .btn-purple {
+      background: linear-gradient(135deg, #7c3aed, var(--purple));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(155,92,246,0.2);
+    }
+    .btn-green {
+      background: linear-gradient(135deg, #21a85a, var(--green));
+      color: #001a0a;
+      box-shadow: 0 4px 14px rgba(46,204,113,0.18);
+    }
+    .btn-orange {
+      background: linear-gradient(135deg, #e06825, var(--orange));
+      color: #1a0800;
+      box-shadow: 0 4px 14px rgba(255,140,66,0.18);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-ghost:not(:disabled):hover { background: rgba(255,255,255,0.08); color: var(--text); border-color: rgba(255,255,255,0.12); }
+
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 8px 14px; font-size: 12px; }
+
+    /* ── RECORDING SECTION ── */
+
+    .lecture-title-box {
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+    }
+    .lecture-title-box input {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .lecture-title-hint {
+      margin-top: 7px;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      line-height: 1.45;
+    }
+
+    .mode-card {
+      display: flex;
+      gap: 14px;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+    .mode-icon {
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      display: grid; place-items: center;
+      background: rgba(245,197,24,0.08);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .mode-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .mode-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .recording-state {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      padding: 10px 14px;
+      border-radius: var(--radius-xs);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+    }
+    .recording-hint {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* Choice buttons */
+    .choice-row { display: flex; gap: 8px; }
+    .choice-btn {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: var(--radius-xs);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .choice-btn.selected {
+      background: rgba(245,197,24,0.1);
+      border-color: rgba(245,197,24,0.3);
+      color: var(--gold);
+    }
+
+    /* ── PROCESS STATUS ── */
+    #status {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    #error {
+      font-size: 12.5px;
+      color: var(--red);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      font-family: var(--font-mono);
+    }
+    .progress-shell {
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--teal));
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* Step list */
+    .step-list { display: flex; flex-direction: column; gap: 6px; }
+    .step {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-xs);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-dim);
+      transition: all 0.25s;
+    }
+    .step span:last-child {
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      padding: 3px 9px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.04);
+    }
+    .step.active {
+      background: rgba(245,197,24,0.06);
+      border-color: rgba(245,197,24,0.2);
+      color: var(--text);
+    }
+    .step.active span:last-child { background: rgba(245,197,24,0.15); color: var(--gold); }
+    .step.done { color: var(--text-muted); }
+    .step.done span:last-child { background: rgba(46,204,113,0.12); color: var(--green); }
+
+    /* ── MEDIA ── */
+    audio, video {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.5);
+    }
+
+    /* ── TRANSCRIPT ── */
+    .transcript-scroll {
+      height: 420px;
+      overflow-y: auto;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(4,5,10,0.6);
+      border: 1px solid var(--border);
+    }
+    .segment {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      align-items: start;
+    }
+    .segment:hover { background: rgba(255,255,255,0.03); }
+    .segment.active {
+      background: rgba(245,197,24,0.06);
+      border-color: rgba(245,197,24,0.2);
+    }
+    .time-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      background: rgba(245,197,24,0.08);
+      border: 1px solid rgba(245,197,24,0.15);
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      flex-shrink: 0;
+      width: auto;
+    }
+    .time-btn:hover { background: rgba(245,197,24,0.15); }
+    .segment-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: rgba(240,234,214,0.75);
+      padding-top: 2px;
+    }
+    .segment.active .segment-text { color: var(--text); }
+    mark {
+      background: rgba(245,197,24,0.22);
+      color: var(--gold);
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+
+    /* Stats strip in transcript */
+    .info-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .info-chip {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .info-chip strong {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .info-chip span { font-size: 12.5px; color: var(--text-muted); }
+
+    /* Search bar */
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 12px;
+    }
+    .jump-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .follow-control {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .follow-control input { width: auto; }
+
+    /* ── STUDY ASSISTANT ── */
+    .study-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 22px;
+      background: linear-gradient(135deg, rgba(78,205,196,0.05), rgba(14,17,32,0.85));
+      border-bottom: 1px solid var(--border);
+    }
+    .assistant-orb {
+      width: 52px; height: 52px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #2bb8b0, var(--teal));
+      display: grid; place-items: center;
+      font-size: 22px;
+      box-shadow: 0 6px 22px rgba(78,205,196,0.2);
+      flex-shrink: 0;
+    }
+    .study-header h2 {
+      font-family: var(--font-head);
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .study-header p { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 700px; }
+
+    /* API key box */
+    .api-box {
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .api-key-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .api-note { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; line-height: 1.5; }
+
+    /* Study tabs */
+    .study-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      width: fit-content;
+    }
+    .study-tab {
+      padding: 9px 16px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      border: 1px solid transparent;
+    }
+    .study-tab:not(:disabled):hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .study-tab.active {
+      background: rgba(245,197,24,0.1);
+      border-color: rgba(245,197,24,0.22);
+      color: var(--gold);
+    }
+
+    /* Study panes */
+    .study-pane { display: none; }
+    .study-pane.active { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Feature card */
+    .feature-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .feature-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 13px;
+      background: rgba(78,205,196,0.1);
+      display: grid; place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .feature-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .feature-desc { font-size: 12px; color: var(--text-muted); }
+    .feature-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* Output area */
+    .feature-output {
+      border-radius: var(--radius-sm);
+      background: rgba(4,5,10,0.55);
+      border: 1px solid var(--border);
+      min-height: 140px;
+      padding: 14px;
+      overflow: auto;
+      max-height: 480px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-dim);
+    }
+    .empty-state strong {
+      display: block;
+      font-size: 15px;
+      color: rgba(240,234,214,0.4);
+      margin-bottom: 6px;
+      font-family: var(--font-head);
+    }
+    .empty-state span { font-size: 12.5px; line-height: 1.6; max-width: 400px; display: block; }
+
+    /* Loading */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.08);
+      border-top-color: var(--gold);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── QUIZ ── */
+    .quiz-shell { display: flex; flex-direction: column; gap: 14px; }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .quiz-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--teal);
+      margin-bottom: 4px;
+    }
+    .quiz-header h4 { font-family: var(--font-head); font-size: 20px; color: var(--text); }
+    .quiz-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-family: var(--font-mono); }
+    .quiz-nav { display: flex; gap: 8px; }
+    .quiz-progress {
+      height: 3px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .quiz-progress span {
+      display: block;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+      transition: width 0.3s;
+    }
+    .quiz-card {
+      padding: 20px;
+      border-radius: var(--radius-sm);
+      background: rgba(4,5,10,0.5);
+      border: 1px solid var(--border);
+    }
+    .quiz-type-badge {
+      display: inline-flex;
+      padding: 5px 11px;
+      border-radius: 99px;
+      background: rgba(78,205,196,0.1);
+      border: 1px solid rgba(78,205,196,0.2);
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .quiz-question-text { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; color: var(--text); }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-option {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 13px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      font-size: 13.5px;
+      line-height: 1.5;
+      transition: all 0.15s;
+    }
+    .quiz-option:not(:disabled):hover { border-color: rgba(245,197,24,0.25); background: rgba(245,197,24,0.04); }
+    .quiz-option.selected { border-color: rgba(245,197,24,0.4); background: rgba(245,197,24,0.08); }
+    .quiz-option-label {
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      display: grid; place-items: center;
+      background: rgba(255,255,255,0.05);
+      font-weight: 700;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .quiz-option.selected .quiz-option-label { background: var(--gold); color: #0a0a00; }
+    .essay-box {
+      min-height: 110px;
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 5;
+      pointer-events: auto;
+      user-select: text;
+    }
+    .quiz-input-shell {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fill-blank-input {
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+      position: relative;
+      z-index: 5;
+      pointer-events: auto;
+      user-select: text;
+    }
+    .fill-blank-input:focus,
+    .essay-box:focus {
+      border-color: rgba(78,205,196,0.35);
+      box-shadow: 0 0 0 3px rgba(78,205,196,0.08);
+    }
+    .fill-blank-note {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .quiz-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .quiz-answer-card {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(46,204,113,0.06);
+      border: 1px solid rgba(46,204,113,0.18);
+    }
+    .quiz-answer-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); margin-bottom: 8px; }
+    .quiz-answer-body { font-size: 13.5px; line-height: 1.6; color: rgba(240,234,214,0.85); }
+    .quiz-answer-meta { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+    .quiz-dots { display: flex; flex-wrap: wrap; gap: 7px; }
+    .quiz-dot {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .quiz-dot.active { background: rgba(245,197,24,0.15); border-color: rgba(245,197,24,0.35); color: var(--gold); }
+    .quiz-dot.done:not(.active) { background: rgba(46,204,113,0.1); border-color: rgba(46,204,113,0.2); color: var(--green); }
+
+    /* ── FLASHCARDS ── */
+    .flash-shell { display: flex; flex-direction: column; gap: 14px; }
+    .flashcard-stage { perspective: 1000px; display: grid; place-items: center; padding: 8px 0; }
+    .flashcard {
+      width: min(100%, 680px);
+      min-height: 280px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .flashcard.flipped { animation: flashFlipPop 0.28s ease; }
+    .flashcard:not(.flipped) .flashcard-back { display: none; }
+    .flashcard.flipped .flashcard-front { display: none; }
+    @keyframes flashFlipPop {
+      0% { transform: rotateY(0deg) scale(0.98); opacity: 0.78; }
+      55% { transform: rotateY(90deg) scale(0.99); opacity: 0.88; }
+      100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+    }
+    .flashcard-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      padding: 26px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      border: 1px solid var(--border);
+    }
+    .flashcard-front {
+      background: linear-gradient(135deg, rgba(245,197,24,0.06) 0%, rgba(14,17,32,0.95) 100%);
+      border-color: rgba(245,197,24,0.12);
+    }
+    .flashcard-back {
+      transform: none;
+      background: linear-gradient(135deg, rgba(78,205,196,0.07) 0%, rgba(14,17,32,0.95) 100%);
+      border-color: rgba(78,205,196,0.14);
+    }
+    .flashcard-kicker { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); }
+    .flashcard-front .flashcard-kicker { color: rgba(245,197,24,0.5); }
+    .flashcard-back .flashcard-kicker { color: rgba(78,205,196,0.5); }
+    .flashcard-text { font-family: var(--font-head); font-size: 22px; line-height: 1.45; color: var(--text); }
+    .flashcard-tip { font-size: 11px; color: var(--text-dim); }
+    .flash-mini {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .flash-mini.active { background: rgba(245,197,24,0.14); border-color: rgba(245,197,24,0.3); color: var(--gold); }
+    .flashcard-grid-mini { display: flex; flex-wrap: wrap; gap: 6px; }
+
+
+    /* ── MATCHING GAME ── */
+    .matching-shell { display: flex; flex-direction: column; gap: 16px; position: relative; isolation: isolate; }
+    .matching-shell::before { content: ""; position: absolute; inset: -35px -20px auto auto; width: 260px; height: 260px; background: radial-gradient(circle, rgba(155,93,229,0.16), transparent 68%); filter: blur(12px); pointer-events: none; z-index: -1; }
+    .matching-hero { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 20px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(18,16,38,0.96), rgba(7,11,24,0.88)); box-shadow: 0 22px 54px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; }
+    .matching-hero h4 { font-family: var(--font-head); font-size: 22px; color: var(--text); }
+    .matching-stats { display: flex; flex-wrap: wrap; gap: 8px; }
+    .matching-stat { min-width: 98px; padding: 11px 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025)); color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 20px rgba(0,0,0,0.14); }
+    .matching-stat strong { display: block; color: var(--text); font-size: 18px; font-family: var(--font-head); margin-bottom: 2px; }
+    .matching-message { padding: 14px 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: var(--text-dim); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); animation: fadeSlideUp 0.25s ease; }
+    .matching-message.good { color: var(--green); border-color: rgba(46,204,113,0.25); background: rgba(46,204,113,0.08); }
+    .matching-message.bad { color: var(--red); border-color: rgba(231,76,60,0.25); background: rgba(231,76,60,0.08); }
+    .matching-board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; perspective: 1400px; }
+    .matching-column { padding: 16px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.07); background: linear-gradient(145deg, rgba(11,16,32,0.88), rgba(6,10,20,0.74)); box-shadow: 0 20px 48px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 10px; }
+    .matching-column-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.13em; color: var(--gold); font-weight: 800; margin-bottom: 3px; }
+    .match-card { min-height: 82px; padding: 15px 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)); color: var(--text); text-align: left; line-height: 1.45; cursor: pointer; transform-style: preserve-3d; transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 12px 24px rgba(0,0,0,0.16); position: relative; overflow: hidden; }
+    .match-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(245,197,24,0.10), transparent 45%); opacity: 0; transition: opacity 0.18s ease; pointer-events: none; }
+    .match-card small { display: block; margin-bottom: 7px; color: var(--text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800; }
+    .match-card:not(:disabled):hover { transform: translateY(-4px) rotateX(3deg) scale(1.012); border-color: rgba(245,197,24,0.28); box-shadow: 0 18px 34px rgba(0,0,0,0.22), 0 0 0 1px rgba(245,197,24,0.08) inset; }
+    .match-card:not(:disabled):hover::after, .match-card.selected::after { opacity: 1; }
+    .match-card.selected { transform: translateY(-4px) scale(1.018); border-color: rgba(245,197,24,0.46); background: linear-gradient(145deg, rgba(245,197,24,0.13), rgba(155,93,229,0.09)); box-shadow: 0 20px 38px rgba(245,197,24,0.08), inset 0 1px 0 rgba(255,255,255,0.05); }
+    .match-card.correct { animation: matchPop 0.45s ease; }
+    .match-card.wrong { animation: matchShake 0.38s ease; border-color: rgba(231,76,60,0.35); }
+    .match-card.matched { opacity: 0.68; cursor: default; border-color: rgba(46,204,113,0.26); background: linear-gradient(145deg, rgba(46,204,113,0.12), rgba(78,205,196,0.06)); }
+    .matching-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .matching-complete { padding: 18px; border-radius: 20px; border: 1px solid rgba(46,204,113,0.25); background: linear-gradient(145deg, rgba(46,204,113,0.12), rgba(245,197,24,0.06)); color: var(--text); box-shadow: 0 18px 34px rgba(0,0,0,0.18); animation: matchPop 0.45s ease; }
+    @keyframes matchPop { 0% { transform: scale(0.96); } 60% { transform: scale(1.025); } 100% { transform: scale(1); } }
+    @keyframes matchShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-4px); } }
+    @media (max-width: 800px) { .matching-board { grid-template-columns: 1fr; } }
+
+    /* ── CHAT ── */
+    .chat-messages {
+      height: 340px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(4,5,10,0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .chat-bubble {
+      max-width: min(82%, 700px);
+      padding: 12px 16px;
+      border-radius: 16px;
+      line-height: 1.65;
+      font-size: 13.5px;
+    }
+    .chat-bubble.user {
+      margin-left: auto;
+      background: linear-gradient(135deg, rgba(245,197,24,0.85), rgba(200,155,16,0.9));
+      color: #0a0800;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-bubble.assistant {
+      margin-right: auto;
+      background: rgba(20,24,46,0.9);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-meta {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      opacity: 0.6;
+      margin-bottom: 6px;
+    }
+    .chat-compose {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .chat-input { min-height: 88px; }
+    .chat-actions { display: flex; flex-direction: column; gap: 8px; }
+    .chat-status { font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); }
+
+    /* AI content */
+    .ai-richtext { font-size: 13.5px; line-height: 1.72; color: rgba(240,234,214,0.85); }
+
+    /* ── MISC ── */
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .flex-row { display: flex; align-items: center; gap: 10px; }
+    .flex-row-sb { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mini-note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+
+
+    /* ── TRANSCRIPT CONTROLS / BOOKMARKS / EDITING ── */
+    .transport-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+    .transport-controls, .bookmark-box {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(4,5,10,0.42));
+      border: 1px solid rgba(255,255,255,0.075);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+    }
+    .media-control-panel {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .control-round {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.075);
+      color: var(--text-muted);
+      font-size: 15px;
+      box-shadow: none;
+    }
+    .control-round.primary {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #090800;
+      box-shadow: 0 8px 24px rgba(245,197,24,0.20);
+      font-size: 18px;
+    }
+    .control-round.danger { color: var(--red); }
+    .control-round:not(:disabled):hover {
+      background: rgba(245,197,24,0.09);
+      color: var(--gold);
+      border-color: rgba(245,197,24,0.22);
+    }
+    .control-round.primary:not(:disabled):hover { color:#090800; filter: brightness(1.05); }
+    .volume-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 178px;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .volume-pill span { color: var(--text-dim); font-size: 13px; }
+    .volume-pill input[type="range"] {
+      padding: 0;
+      height: 4px;
+      accent-color: var(--gold);
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .bookmark-main-btn {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      background: rgba(78,205,196,0.09);
+      border: 1px solid rgba(78,205,196,0.20);
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .shortcut-strip {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .shortcut-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1;
+    }
+    .shortcut-chip kbd {
+      min-width: 22px;
+      padding: 4px 6px;
+      border-radius: 7px;
+      background: rgba(245,197,24,0.10);
+      border: 1px solid rgba(245,197,24,0.18);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-align: center;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.3);
+    }
+    .bookmark-list { display: flex; flex-direction: column; gap: 8px; max-height: 170px; overflow-y: auto; margin-top: 10px; }
+    .bookmark-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      border-radius: 12px;
+      background: rgba(4,5,10,0.45);
+      border: 1px solid var(--border);
+    }
+    .bookmark-item:hover { border-color: rgba(245,197,24,0.18); background: rgba(245,197,24,0.035); }
+    .bookmark-note { font-size: 12px; color: rgba(240,234,214,0.78); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .segment-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .segment-mini-btn {
+      padding: 5px 8px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .segment-mini-btn:hover { color: var(--text); border-color: rgba(245,197,24,0.22); }
+    .segment-mini-btn.is-bookmarked { color: var(--gold); background: rgba(245,197,24,0.10); border-color: rgba(245,197,24,0.24); }
+    .edit-segment-box { display: flex; flex-direction: column; gap: 8px; }
+    .edit-segment-box textarea { min-height: 92px; }
+
+    .quiz-feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      line-height: 1.55;
+      color: rgba(240,234,214,0.84);
+    }
+    .quiz-feedback.good { border-color: rgba(46,204,113,0.22); background: rgba(46,204,113,0.055); }
+    .quiz-feedback.bad { border-color: rgba(255,94,91,0.24); background: rgba(255,94,91,0.055); }
+
+
+
+    /* ── LECTURE LIBRARY ── */
+    .library-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .library-list { display: grid; gap: 12px; }
+    .library-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(4,5,10,0.45);
+      border: 1px solid var(--border);
+      transition: all 0.18s;
+    }
+    .library-card:hover { border-color: rgba(245,197,24,0.18); background: rgba(245,197,24,0.035); }
+    .library-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .library-meta { display:flex; flex-wrap:wrap; gap:7px; color: var(--text-muted); font-size: 12px; }
+    .library-meta span { padding: 4px 8px; border-radius: 99px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+    .library-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .save-panel {
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:end;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(78,205,196,0.04);
+      border: 1px solid rgba(78,205,196,0.14);
+      margin-bottom: 14px;
+    }
+    @media (max-width: 760px) {
+      .library-card { grid-template-columns: 1fr; }
+      .library-actions { justify-content:flex-start; }
+      .save-panel { grid-template-columns: 1fr; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .app-shell { grid-template-columns: 1fr; height: auto; overflow: auto; }
+      .sidebar { height: auto; }
+      .sidebar-inner { padding: 20px 16px; }
+      body { overflow: auto; }
+      .content { overflow: visible; }
+      .content-scroll { overflow: visible; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .info-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 680px) {
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .topbar-stats { flex-direction: row; flex-wrap: wrap; }
+      .search-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .study-tabs { flex-wrap: wrap; width: 100%; }
+      .chat-compose { grid-template-columns: 1fr; }
+      .flashcard-text { font-size: 18px; }
+      .quiz-question-text { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand">
+          <div class="brand-logo">🎓</div>
+          <div>
+            <div class="brand-name">LectureNote Studio</div>
+            <div class="brand-tagline">Offline AI study workspace</div>
+          </div>
+        </div>
+
+        <div class="nav-label">Workspace</div>
+        <button class="nav-item active" data-view="view-capture" onclick="setView('view-capture')">
+          <div class="nav-icon">🎙️</div>
+          <div>
+            <div class="nav-text-title">Capture &amp; Process</div>
+            <div class="nav-text-desc">Upload, record &amp; transcribe</div>
+          </div>
+        </button>
+        <button class="nav-item" data-view="view-transcript" onclick="setView('view-transcript')">
+          <div class="nav-icon">📄</div>
+          <div>
+            <div class="nav-text-title">Transcript Workspace</div>
+            <div class="nav-text-desc">Replay &amp; navigate with timestamps</div>
+          </div>
+        </button>
+        <button class="nav-item" data-view="view-study" onclick="setView('view-study')">
+          <div class="nav-icon">✨</div>
+          <div>
+            <div class="nav-text-title">Study Assistant</div>
+            <div class="nav-text-desc">Summaries, quiz, flashcards, chat</div>
+          </div>
+        </button>
+        <button class="nav-item" data-view="view-library" onclick="setView('view-library'); renderLectureLibrary();">
+          <div class="nav-icon">📚</div>
+          <div>
+            <div class="nav-text-title">Lecture Library</div>
+            <div class="nav-text-desc">Save, load &amp; delete lectures</div>
+          </div>
+        </button>
+
+        <div class="sidebar-footer">
+          <div class="status-pill" id="stateBadge">
+            <span class="status-dot"></span>
+            Idle
+          </div>
+          <div class="status-pill" id="assistantReadyBadge">
+            <span class="status-dot"></span>
+            Transcript required
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── CONTENT ── -->
+    <div class="content">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <div>
+          <div class="topbar-title">Smarter lecture studying</div>
+          <div class="topbar-sub">Transcribe first, then generate summaries, interactive quizzes, flashcards, or a Q&amp;A assistant powered by Groq Llama 3.1 8B Instant.</div>
+        </div>
+        <div class="topbar-stats">
+          <div class="stat-chip"><strong id="modelStat">Model: small</strong></div>
+          <div class="stat-chip" id="segmentStat">Segments: 0</div>
+          <div class="stat-chip" id="finishedStat">Finished: —</div>
+        </div>
+      </header>
+
+      <!-- Scrollable area -->
+      <div class="content-scroll">
+
+        <!-- ══ CAPTURE VIEW ══ -->
+        <section id="view-capture" class="page-view active">
+          <div class="stack">
+
+            <!-- Hero + preview -->
+            <div class="grid-2">
+
+              <div class="hero-card">
+                <div class="hero-header">
+                  <div class="hero-orb">🎧</div>
+                  <div>
+                    <div class="hero-headline">Capture, process &amp; review your lectures</div>
+                  </div>
+                </div>
+                <p class="hero-desc">One workspace for everything — upload media, record your voice or online class, transcribe with Whisper, and unlock AI-powered revision tools in the Study Assistant.</p>
+                <div class="tag-row">
+                  <span class="tag">Upload audio/video</span>
+                  <span class="tag">Record microphone</span>
+                  <span class="tag">Screen audio</span>
+                  <span class="tag">Pause &amp; resume</span>
+                  <span class="tag gold">Whisper transcription</span>
+                </div>
+                <div class="stats-row">
+                  <div class="stat-box">
+                    <div class="s-label">Current file</div>
+                    <div class="s-value" id="fileStat">None</div>
+                    <div class="s-note">Selected media or latest recording.</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="s-label">Processing timer</div>
+                    <div class="s-value" id="timerText">00:00</div>
+                    <div class="s-note">Time for current transcription.</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="s-label">Output mode</div>
+                    <div class="s-value">Transcript + AI</div>
+                    <div class="s-note">Study tools unlock after transcription.</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="s-label">AI model</div>
+                    <div class="s-value">Groq Llama</div>
+                    <div class="s-note">Activated on demand in Study Assistant.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-head"><div class="card-title">Media Preview</div></div>
+                <div class="card-sub">Preview your uploaded or recorded media before transcribing.</div>
+                <div class="card-body">
+                  <audio id="audioPlayer" controls></audio>
+                  <video id="videoPlayer" controls style="display:none; margin-top:10px;"></video>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls + status -->
+            <div class="grid-2">
+
+              <div class="card">
+                <div class="card-head"><div class="card-title">Capture &amp; Controls</div></div>
+                <div class="card-sub">Choose your source, recording mode, model, and processing options.</div>
+                <div class="card-body">
+                  <div class="stack" style="gap:14px;">
+
+                    <button class="btn btn-gold btn-full" onclick="chooseMedia()">📁 Upload Audio / Video</button>
+
+                    <div class="lecture-title-box">
+                      <label for="lectureTitleInput">Lecture / Recording Title</label>
+                      <input id="lectureTitleInput" type="text" placeholder="Upload or record first, then rename here…" oninput="updateLectureTitle(this.value)">
+                      <div class="lecture-title-hint">This title is used in the app, transcript exports, bookmarks, and study workspace.</div>
+                      <div class="row-2 mt-12">
+                        <button class="btn btn-green btn-full" onclick="saveCurrentLectureToLibrary()">💾 Save Now</button>
+                        <button class="btn btn-ghost btn-full" onclick="setView('view-library'); renderLectureLibrary();">📚 Open Library</button>
+                      </div>
+                    </div>
+
+                    <div class="mode-card">
+                      <div class="mode-icon">🎙️</div>
+                      <div style="flex:1;">
+                        <div class="mode-title">Record own voice</div>
+                        <div class="mode-desc">Record only your microphone, record your microphone with your display, or record microphone + display + display audio.</div>
+                        <div class="choice-row mt-12">
+                          <button class="choice-btn selected" id="voiceAudioChoice" onclick="setVoiceMode('audio')">Voice Only</button>
+                          <button class="choice-btn" id="voiceDisplayChoice" onclick="setVoiceMode('display')">Voice + Display</button>
+                          <button class="choice-btn" id="voiceDisplayAudioChoice" onclick="setVoiceMode('display_audio')">Voice + Display + Display Audio</button>
+                        </div>
+                        <div class="mt-12">
+                          <button class="btn btn-purple btn-full" id="micRecordBtn" onclick="startMicRecording()">Start Own Voice Recording</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mode-card">
+                      <div class="mode-icon">🖥️</div>
+                      <div style="flex:1;">
+                        <div class="mode-title">Record online class</div>
+                        <div class="mode-desc">Capture screen/system audio only or display + screen audio. Microphone is not used.</div>
+                        <div class="choice-row mt-12">
+                          <button class="choice-btn selected" id="classAudioChoice" onclick="setOnlineMode('audio')">Screen Audio Only</button>
+                          <button class="choice-btn" id="classDisplayChoice" onclick="setOnlineMode('display')">Display + Audio</button>
+                        </div>
+                        <div class="mt-12">
+                          <button class="btn btn-teal btn-full" id="screenRecordBtn" onclick="startOnlineClassRecording()">Start Online Class Recording</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row-2">
+                      <button class="btn btn-orange btn-full" id="pauseRecordBtn" onclick="pauseRecording()" disabled>⏸ Pause</button>
+                      <button class="btn btn-green btn-full" id="resumeRecordBtn" onclick="resumeRecording()" disabled>▶ Resume</button>
+                    </div>
+                    <button class="btn btn-red btn-full" id="stopBtn" onclick="stopRecording()" disabled>⏹ Stop Recording</button>
+
+                    <div class="recording-state" id="recordingState">● Recording status: not recording</div>
+                    <div class="recording-hint mini-note">Pause and resume to skip breaks or unwanted parts while recording.</div>
+
+                    <div>
+                      <label>Transcription Quality</label>
+                      <select id="modelSelect">
+                        <option value="base">⚡ Preview — fastest, basic accuracy</option>
+                        <option value="small" selected>✅ Balanced — recommended</option>
+                        <option value="turbo">🚀 Enhanced — better quality, practical speed</option>
+                        <option value="large-v3">🧠 Precision — maximum accuracy</option>
+                      </select>
+                    </div>
+
+                    <div class="row-2">
+                      <button class="btn btn-teal btn-full" id="transcribeBtn" onclick="transcribe()">Transcribe</button>
+                      <button class="btn btn-red btn-full" id="cancelBtn" onclick="cancelTranscription()" disabled>Stop Process</button>
+                    </div>
+                    <div class="row-2">
+                      <button class="btn btn-ghost btn-full" onclick="saveTranscriptTxt()">Save TXT</button>
+                      <button class="btn btn-ghost btn-full" onclick="saveTranscriptJson()">Save JSON</button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-head"><div class="card-title">Process Status</div></div>
+                <div class="card-sub">Live progress of the current transcription pipeline.</div>
+                <div class="card-body">
+                  <div class="stack" style="gap:12px;">
+                    <div id="status">Upload a file or record, then press Transcribe.</div>
+                    <div class="progress-shell"><div class="progress-bar" id="progressBar"></div></div>
+                    <div class="step-list">
+                      <div class="step" id="step-convert"><span>1 · Convert media</span><span>Waiting</span></div>
+                      <div class="step" id="step-load"><span>2 · Load Whisper model</span><span>Waiting</span></div>
+                      <div class="step" id="step-transcribe"><span>3 · Transcribe speech</span><span>Waiting</span></div>
+                      <div class="step" id="step-render"><span>4 · Render transcript</span><span>Waiting</span></div>
+                    </div>
+                    <div id="error"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ TRANSCRIPT VIEW ══ -->
+        <section id="view-transcript" class="page-view">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Transcript Workspace</div>
+              <div class="flex-row">
+                <label class="follow-control" style="margin:0;">
+                  <input type="checkbox" id="autoFollowToggle" onchange="toggleAutoFollow()">
+                  <span style="font-size:12.5px;color:var(--text-muted);font-weight:500;text-transform:none;letter-spacing:0;">Auto-follow</span>
+                </label>
+                <button class="btn btn-ghost btn-sm" onclick="copyTranscript()">Copy Transcript</button>
+              </div>
+            </div>
+            <div class="card-sub">Click any timestamp to jump there, or search by keyword. Auto-follow scrolls to the current playback line.</div>
+            <div class="card-body">
+              <div class="stack" style="gap:14px;">
+
+                <div class="info-strip">
+                  <div class="info-chip"><strong>File</strong><span id="fileStatClone">—</span></div>
+                  <div class="info-chip"><strong>Model</strong><span id="modelStatClone">—</span></div>
+                  <div class="info-chip"><strong>Segments</strong><span id="segmentStatClone">—</span></div>
+                  <div class="info-chip"><strong>Finished</strong><span id="finishedStatClone">—</span></div>
+                </div>
+
+                <div class="transport-card">
+                  <div class="transport-controls">
+                    <label>Playback controls</label>
+                    <div class="media-control-panel">
+                      <button class="control-round primary" title="Play / Pause (Space)" onclick="togglePlayback()">▶</button>
+                      <button class="control-round danger" title="Pause (S)" onclick="stopPlayback()">⏸</button>
+                      <button class="control-round" title="Back 10 seconds" onclick="seekRelative(-10)">↶10</button>
+                      <button class="control-round" title="Forward 10 seconds" onclick="seekRelative(10)">10↷</button>
+                      <div class="volume-pill" title="Volume">
+                        <span>🔈</span>
+                        <input id="volumeSlider" type="range" min="0" max="100" value="100" oninput="setPlayerVolume(this.value)">
+                        <span id="volumeText">100%</span>
+                      </div>
+                      <button class="bookmark-main-btn" onclick="addBookmarkAtCurrentTime()">🔖 Bookmark</button>
+                    </div>
+                    <div class="shortcut-strip" aria-label="Keyboard shortcuts">
+                      <span class="shortcut-chip"><kbd>Space</kbd> Play</span>
+                      <span class="shortcut-chip"><kbd>S</kbd> Pause</span>
+                      <span class="shortcut-chip"><kbd>B</kbd> Bookmark</span>
+                      <span class="shortcut-chip"><kbd>E</kbd> Edit line</span>
+                      <span class="shortcut-chip"><kbd>←</kbd><kbd>→</kbd> Seek</span>
+                      <span class="shortcut-chip"><kbd>↑</kbd><kbd>↓</kbd> Volume</span>
+                    </div>
+                  </div>
+                  <div class="bookmark-box">
+                    <div class="flex-row-sb">
+                      <label style="margin:0;">Bookmarks</label>
+                      <button class="segment-mini-btn" onclick="clearBookmarks()">Clear</button>
+                    </div>
+                    <div id="bookmarkList" class="bookmark-list">
+                      <div class="empty-state" style="padding:14px;"><span>No bookmarks yet. Press B or click Bookmark.</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="search-grid">
+                  <div>
+                    <label>Search transcript or timestamp</label>
+                    <input id="search" placeholder="Keyword or 03:20…" oninput="searchTranscript()">
+                  </div>
+                  <div>
+                    <label>Jump to time</label>
+                    <div class="jump-row">
+                      <input id="jumpInput" placeholder="mm:ss">
+                      <button class="btn btn-ghost btn-sm" onclick="jumpToInput()">Jump</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="transcriptPanel" class="transcript-scroll">
+                  <div class="empty-state">
+                    <strong>No transcript yet</strong>
+                    <span>Transcribe a lecture first. Then click any timestamp to jump directly to that point in the recording.</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ STUDY VIEW ══ -->
+        <section id="view-study" class="page-view">
+          <div class="card">
+
+            <div class="study-header">
+              <div class="assistant-orb">✦</div>
+              <div style="flex:1;">
+                <h2>Study Assistant</h2>
+                <p>Finish transcription first, then generate what you need on demand — summary, quiz, flashcards, or lecture Q&amp;A. Nothing is created automatically.</p>
+                <div class="tag-row" style="margin-top:10px;">
+                  <span class="tag teal">Summary</span>
+                  <span class="tag teal">Interactive Quiz</span>
+                  <span class="tag teal">Flashcards</span>
+                  <span class="tag teal">Lecture Chat</span>
+                  <span class="tag gold">Llama 3.1 8B Instant</span>
+                  <span class="tag warn" id="apiKeyBadge">API key not saved</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="stack" style="gap:16px;">
+
+                <div class="api-box">
+                  <label for="groqApiKey">Groq API Key</label>
+                  <div class="api-key-row">
+                    <input id="groqApiKey" type="password" placeholder="Paste your Groq API key here…" oninput="updateApiKeyBadge()">
+                    <button class="btn btn-ghost btn-sm" onclick="saveGroqKey()">Save Key</button>
+                  </div>
+                  <div class="api-note">Stored only on your computer using localStorage. AI outputs unlock after transcription is complete.</div>
+                </div>
+
+                <div class="study-tabs">
+                  <button class="study-tab active" data-tab="tab-summary" onclick="setStudyTab('tab-summary')">📝 Summary</button>
+                  <button class="study-tab" data-tab="tab-quiz" onclick="setStudyTab('tab-quiz')">❓ Quiz</button>
+                  <button class="study-tab" data-tab="tab-flashcards" onclick="setStudyTab('tab-flashcards')">🗂️ Flashcards</button>
+                  <button class="study-tab" data-tab="tab-matching" onclick="setStudyTab('tab-matching')">🎮 Matching Game</button>
+                  <button class="study-tab" data-tab="tab-chat" onclick="setStudyTab('tab-chat')">💬 Ask About Lecture</button>
+                </div>
+
+                <!-- SUMMARY -->
+                <div id="tab-summary" class="study-pane active">
+                  <div class="feature-card">
+                    <div class="feature-head">
+                      <div class="feature-icon">📝</div>
+                      <div>
+                        <div class="feature-title">Summary Generator</div>
+                        <div class="feature-desc">Generate a clean summary based on the transcript and your preferred style.</div>
+                      </div>
+                    </div>
+                    <div class="feature-body">
+                      <div class="grid-2-eq">
+                        <div>
+                          <label>Summary style</label>
+                          <select id="summaryType">
+                            <option value="short overview">Short Overview</option>
+                            <option value="detailed notes" selected>Detailed Notes</option>
+                            <option value="topic by topic">Topic by Topic</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label>Focus</label>
+                          <select id="summaryFocus">
+                            <option value="overall understanding" selected>Overall Understanding</option>
+                            <option value="exam revision">Exam Revision</option>
+                            <option value="key concepts and examples">Key Concepts &amp; Examples</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <button class="btn btn-teal ai-action" id="summaryBtn" onclick="generateSummary()">Generate Summary</button>
+                      </div>
+                      <div class="feature-output" id="summaryOutput">
+                        <div class="empty-state"><strong>No summary yet</strong><span>Transcribe a lecture first, then click Generate Summary.</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="tab-quiz" class="study-pane">
+                  <div class="feature-card">
+                    <div class="feature-head">
+                      <div class="feature-icon">❓</div>
+                      <div>
+                        <div class="feature-title">Interactive Quiz Mode</div>
+                        <div class="feature-desc">Generate a structured quiz and answer it directly inside the app.</div>
+                      </div>
+                    </div>
+                    <div class="feature-body">
+                      <div class="grid-3">
+                        <div>
+                          <label>Question count</label>
+                          <select id="quizCount">
+                            <option value="10" selected>10 Questions</option>
+                            <option value="20">20 Questions</option>
+                            <option value="30">30 Questions</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label>Quiz type</label>
+                          <select id="quizType">
+                            <option value="multiple choice" selected>Multiple Choice</option>
+                            <option value="true/false">True / False</option>
+                            <option value="short answer">Short Answer</option>
+                            <option value="fill in the blank">Fill in the Blank</option>
+                            <option value="mixed">Mixed</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label>Difficulty</label>
+                          <select id="quizDifficulty">
+                            <option value="easy">Easy</option>
+                            <option value="balanced" selected>Balanced</option>
+                            <option value="challenging">Challenging</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <button class="btn btn-purple ai-action" id="quizBtn" onclick="generateQuiz()">Generate Quiz</button>
+                      </div>
+                      <div class="feature-output" id="quizOutput">
+                        <div class="empty-state"><strong>No quiz yet</strong><span>Choose your options and click Generate Quiz.</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FLASHCARDS -->
+                <div id="tab-flashcards" class="study-pane">
+                  <div class="feature-card">
+                    <div class="feature-head">
+                      <div class="feature-icon">🗂️</div>
+                      <div>
+                        <div class="feature-title">Interactive Flashcards</div>
+                        <div class="feature-desc">Create a flashcard deck and flip through it directly inside the app.</div>
+                      </div>
+                    </div>
+                    <div class="feature-body">
+                      <div class="grid-2-eq">
+                        <div>
+                          <label>Card count</label>
+                          <select id="flashcardCount">
+                            <option value="10" selected>10 Cards</option>
+                            <option value="20">20 Cards</option>
+                            <option value="30">30 Cards</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label>Flashcard focus</label>
+                          <select id="flashcardFocus">
+                            <option value="key definitions" selected>Key Definitions</option>
+                            <option value="revision essentials">Revision Essentials</option>
+                            <option value="exam-style recall">Exam-Style Recall</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <button class="btn btn-green ai-action" id="flashcardsBtn" onclick="generateFlashcards()">Generate Flashcards</button>
+                      </div>
+                      <div class="feature-output" id="flashcardsOutput">
+                        <div class="empty-state"><strong>No flashcards yet</strong><span>Choose your options and click Generate Flashcards.</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MATCHING GAME -->
+                <div id="tab-matching" class="study-pane">
+                  <div class="feature-card">
+                    <div class="feature-head">
+                      <div class="feature-icon">🎮</div>
+                      <div>
+                        <div class="feature-title">3D AI Matching Game</div>
+                        <div class="feature-desc">Match lecture concepts with definitions, examples, causes, effects, or dates in a fast interactive game.</div>
+                      </div>
+                    </div>
+                    <div class="feature-body">
+                      <div class="grid-2-eq">
+                        <div>
+                          <label>Pair count</label>
+                          <select id="matchingCount">
+                            <option value="8" selected>8 Pairs</option>
+                            <option value="12">12 Pairs</option>
+                            <option value="16">16 Pairs</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label>Game focus</label>
+                          <select id="matchingFocus">
+                            <option value="concepts and definitions" selected>Concepts &amp; Definitions</option>
+                            <option value="events and outcomes">Events &amp; Outcomes</option>
+                            <option value="people and roles">People &amp; Roles</option>
+                            <option value="mixed exam revision">Mixed Exam Revision</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <button class="btn btn-purple ai-action" id="matchingBtn" onclick="generateMatchingGame()">Generate Matching Game</button>
+                      </div>
+                      <div class="feature-output" id="matchingOutput">
+                        <div class="empty-state"><strong>No matching game yet</strong><span>Choose your options and click Generate Matching Game.</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CHAT -->
+                <div id="tab-chat" class="study-pane">
+                  <div class="feature-card">
+                    <div class="feature-head">
+                      <div class="feature-icon">💬</div>
+                      <div>
+                        <div class="feature-title">Ask About Lecture</div>
+                        <div class="feature-desc">Interactive topic-aware lecture chat. Ask about the lecture, its wider topic, background context, examples, or exam-focused points.</div>
+                      </div>
+                    </div>
+                    <div class="feature-body">
+                      <div class="chat-messages" id="chatMessages">
+                        <div class="chat-bubble assistant">
+                          <div class="chat-meta">Study Assistant</div>
+                          Once your transcript is ready, ask me about the lecture or the wider topic around it.
+                        </div>
+                      </div>
+                      <div class="chat-compose">
+                        <textarea id="lectureQuestion" class="chat-input" placeholder="Ask about the lecture or its wider topic."></textarea>
+                        <div class="chat-actions">
+                          <button class="btn btn-gold ai-action" id="askBtn" onclick="askLectureQuestion()">Ask</button>
+                          <button class="btn btn-ghost" onclick="clearLectureChat()">Clear</button>
+                          <div class="chat-status" id="chatStatus">Ready after transcript.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ LECTURE LIBRARY VIEW ══ -->
+        <section id="view-library" class="page-view">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Lecture Library</div>
+              <div class="flex-row">
+                <button class="btn btn-green btn-sm" onclick="saveCurrentLectureToLibrary()">💾 Save Current</button>
+                <button class="btn btn-ghost btn-sm" onclick="renderLectureLibrary()">Refresh</button>
+              </div>
+            </div>
+            <div class="card-sub">Auto-saves the full lecture workspace: transcript, bookmarks, summary, quiz, flashcards, and chat/questions. Load it later or delete old lectures.</div>
+            <div class="card-body">
+              <div class="save-panel">
+                <div>
+                  <label>Current lecture title</label>
+                  <input id="libraryTitleInput" placeholder="Lecture title…" oninput="syncLibraryTitleToMain(this.value)">
+                </div>
+                <button class="btn btn-gold" onclick="saveCurrentLectureToLibrary()">Save Now</button>
+              </div>
+              <div id="librarySaveMessage" class="mini-note" style="display:none; margin-top:10px; color:var(--green);"></div>
+              <div class="library-toolbar">
+                <div class="mini-note">Saved lectures are stored locally on this computer using localStorage.</div>
+                <button class="btn btn-red btn-sm" onclick="deleteAllSavedLectures()">Delete All</button>
+              </div>
+              <div id="lectureLibraryList" class="library-list">
+                <div class="empty-state"><strong>No saved lectures yet</strong><span>Choose or transcribe a lecture. Your work auto-saves here as you edit, bookmark, generate study materials, or chat.</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /content-scroll -->
+    </div><!-- /content -->
+  </div><!-- /app-shell -->
+
+  <script>
+const { ipcRenderer, clipboard } = require("electron");
+const { spawn, execFile } = require("child_process");
+const path = require("path");
+
+let selectedMediaPath = "";
+let currentMediaKind = "";
+let segments = [];
+let mediaRecorder = null;
+let recordedChunks = [];
+let onlineRecordingMode = "audio";
+let voiceRecordingMode = "audio";
+let currentProcess = null;
+let timerInterval = null;
+let processStartedAt = null;
+let lastElapsedText = "00:00";
+let activeSegmentIndex = -1;
+let autoFollowTranscript = false;
+let userIsManuallyScrollingTranscript = false;
+let manualScrollTimer = null;
+let transcriptPlainText = "";
+let chatHistory = [];
+const GROQ_MODEL = "llama-3.1-8b-instant";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+let quizData = null;
+let quizUserAnswers = {};
+let quizCurrentIndex = 0;
+let flashcardData = null;
+let flashCurrentIndex = 0;
+let matchingData = null;
+let matchingSelected = { concept: null, match: null };
+let matchingStats = { attempts: 0, streak: 0, bestStreak: 0, message: "Pick one concept and one definition to match them.", messageType: "" };
+let transcriptBookmarks = [];
+let currentLectureTitle = "";
+let cachedLectureSummaryForAI = "";
+let cachedStudyPackKey = "";
+let currentSavedLectureId = "";
+
+
+const audioPlayer = document.getElementById("audioPlayer");
+const videoPlayer = document.getElementById("videoPlayer");
+const statusBox = document.getElementById("status");
+const errorBox = document.getElementById("error");
+const transcriptPanel = document.getElementById("transcriptPanel");
+const stateBadge = document.getElementById("stateBadge");
+
+function isVideo(filePath) {
+  return /\.(mp4|mov|mkv|webm|avi|m4v|wmv)$/i.test(filePath);
+}
+
+function basename(filePath) {
+  return filePath.split(/[\\\/]/).pop();
+}
+
+function titleFromPath(filePath) {
+  const name = basename(filePath || "");
+  return name.replace(/\.[^.]+$/, "") || "Untitled lecture";
+}
+
+function sanitizeFileName(name) {
+  return String(name || "lecture")
+    .trim()
+    .replace(/[<>:"/\\|?*]+/g, "-")
+    .replace(/\s+/g, " ")
+    .slice(0, 80) || "lecture";
+}
+
+function getLectureTitle() {
+  const input = document.getElementById("lectureTitleInput");
+  return (input && input.value.trim()) || currentLectureTitle || titleFromPath(selectedMediaPath);
+}
+
+function setLectureTitle(title) {
+  currentLectureTitle = String(title || "").trim() || titleFromPath(selectedMediaPath);
+  const input = document.getElementById("lectureTitleInput");
+  if (input) input.value = currentLectureTitle;
+  updateLectureTitleDisplay();
+}
+
+function updateLectureTitle(value) {
+  currentLectureTitle = String(value || "").trim();
+  updateLectureTitleDisplay();
+}
+
+function updateLectureTitleDisplay() {
+  const title = getLectureTitle();
+  const fileStat = document.getElementById("fileStat");
+  const fileStatClone = document.getElementById("fileStatClone");
+  if (fileStat) fileStat.innerText = title || "None";
+  if (fileStatClone) fileStatClone.innerText = title || "—";
+  const libraryInput = document.getElementById("libraryTitleInput");
+  if (libraryInput && document.activeElement !== libraryInput) libraryInput.value = title || "";
+}
+
+function setStatus(text) {
+  statusBox.innerHTML = text;
+}
+
+function setState(state) {
+  stateBadge.innerHTML = '<span class="status-dot"></span>' + state;
+}
+
+function resetSteps() {
+  ["convert", "load", "transcribe", "render"].forEach(name => {
+    const el = document.getElementById("step-" + name);
+    el.className = "step";
+    el.lastElementChild.textContent = "Waiting";
+  });
+  setProgress(0);
+  setStudyAssistantReady(false);
+}
+
+function setStep(name, status) {
+  const order = ["convert", "load", "transcribe", "render"];
+  const activeIndex = order.indexOf(name);
+
+  order.forEach((step, index) => {
+    const el = document.getElementById("step-" + step);
+    el.className = "step";
+
+    if (index < activeIndex) {
+      el.classList.add("done");
+      el.lastElementChild.textContent = "Done";
+    } else if (index === activeIndex) {
+      el.classList.add("active");
+      el.lastElementChild.textContent = status || "Running";
+    }
+  });
+
+  const progress = { convert: 25, load: 50, transcribe: 75, render: 92 }[name] || 0;
+  setProgress(progress);
+}
+
+function finishSteps() {
+  ["convert", "load", "transcribe", "render"].forEach(name => {
+    const el = document.getElementById("step-" + name);
+    el.className = "step done";
+    el.lastElementChild.textContent = "Done";
+  });
+  setProgress(100);
+}
+
+function setProgress(value) {
+  document.getElementById("progressBar").style.width = value + "%";
+}
+
+function formatElapsed(ms) {
+  const total = Math.floor(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  if (h > 0) return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+
+function startTimer() {
+  processStartedAt = Date.now();
+  lastElapsedText = "00:00";
+  document.getElementById("timerText").innerText = "00:00";
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    lastElapsedText = formatElapsed(Date.now() - processStartedAt);
+    document.getElementById("timerText").innerText = lastElapsedText;
+  }, 500);
+}
+
+function stopTimer(finalLabel) {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  if (processStartedAt) lastElapsedText = formatElapsed(Date.now() - processStartedAt);
+  document.getElementById("timerText").innerText = lastElapsedText;
+  document.getElementById("finishedStat").innerText = "Finished: " + lastElapsedText;
+}
+
+async function chooseMedia() {
+  const filePath = await ipcRenderer.invoke("choose-media");
+  if (!filePath) return;
+
+  selectedMediaPath = filePath;
+  currentSavedLectureId = "";
+  segments = [];
+  activeSegmentIndex = -1;
+  setStudyAssistantReady(false);
+  resetStudyAssistantOutputs();
+
+  setPlayer(filePath, isVideo(filePath) ? "video" : "audio");
+  loadBookmarks();
+
+  transcriptPanel.innerHTML = '<div class="empty-state"><strong>Ready to transcribe</strong><span>Press Transcribe to generate timestamped notes.</span></div>';
+  setLectureTitle(titleFromPath(filePath));
+  document.getElementById("segmentStat").innerText = "Segments: 0";
+  document.getElementById("finishedStat").innerText = "Finished: —";
+  setStatus("Selected: " + getLectureTitle());
+  errorBox.innerText = "";
+  resetSteps();
+  setState("Idle");
+  resetStudyAssistant();
+}
+
+function setPlayer(filePath, mediaKind) {
+  currentMediaKind = mediaKind || (isVideo(filePath) ? "video" : "audio");
+  if (currentMediaKind === "video") {
+    videoPlayer.style.display = "block";
+    audioPlayer.style.display = "none";
+    audioPlayer.pause();
+    audioPlayer.removeAttribute("src");
+    videoPlayer.src = filePath;
+  } else {
+    audioPlayer.style.display = "block";
+    videoPlayer.style.display = "none";
+    videoPlayer.pause();
+    videoPlayer.removeAttribute("src");
+    audioPlayer.src = filePath;
+  }
+}
+
+function setRecordingControls(isRecording, isPaused) {
+  document.getElementById("micRecordBtn").disabled = isRecording;
+  document.getElementById("screenRecordBtn").disabled = isRecording;
+  document.getElementById("voiceAudioChoice").disabled = isRecording;
+  document.getElementById("voiceDisplayChoice").disabled = isRecording;
+  document.getElementById("voiceDisplayAudioChoice").disabled = isRecording;
+  document.getElementById("classAudioChoice").disabled = isRecording;
+  document.getElementById("classDisplayChoice").disabled = isRecording;
+  document.getElementById("stopBtn").disabled = !isRecording;
+  document.getElementById("pauseRecordBtn").disabled = !isRecording || isPaused;
+  document.getElementById("resumeRecordBtn").disabled = !isRecording || !isPaused;
+  document.getElementById("recordingState").innerText =
+    !isRecording ? "● Recording status: not recording"
+    : isPaused ? "⏸ Recording status: paused — this part will not be included"
+    : "🔴 Recording status: recording";
+}
+
+function setVoiceMode(mode) {
+  voiceRecordingMode = mode;
+  document.getElementById("voiceAudioChoice").classList.toggle("selected", mode === "audio");
+  document.getElementById("voiceDisplayChoice").classList.toggle("selected", mode === "display");
+  document.getElementById("voiceDisplayAudioChoice").classList.toggle("selected", mode === "display_audio");
+  if (mode === "audio") {
+    setStatus("Mode: Voice Only. Records your microphone audio.");
+  } else if (mode === "display") {
+    setStatus("Mode: Voice + Display. Records your microphone together with the selected screen/window.");
+  } else {
+    setStatus("Mode: Voice + Display + Display Audio. Records microphone, selected display, and display/system audio when available.");
+  }
+}
+
+function setOnlineMode(mode) {
+  onlineRecordingMode = mode;
+  document.getElementById("classAudioChoice").classList.toggle("selected", mode === "audio");
+  document.getElementById("classDisplayChoice").classList.toggle("selected", mode === "display");
+  if (mode === "audio") {
+    setStatus("Mode: Screen Audio Only. Choose a screen/window — only its system audio will be saved.");
+  } else {
+    setStatus("Mode: Display + Screen Audio. Records the selected display and its system audio.");
+  }
+}
+
+function setupRecorder(stream, recordingType, preferredType) {
+  recordedChunks = [];
+  let mimeType;
+  if (preferredType === "audio") {
+    mimeType = MediaRecorder.isTypeSupported("audio/webm; codecs=opus") ? "audio/webm; codecs=opus" : "audio/webm";
+  } else {
+    mimeType = MediaRecorder.isTypeSupported("video/webm; codecs=vp9") ? "video/webm; codecs=vp9"
+      : MediaRecorder.isTypeSupported("video/webm") ? "video/webm" : "audio/webm";
+  }
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType });
+  mediaRecorder.ondataavailable = event => { if (event.data.size > 0) recordedChunks.push(event.data); };
+  mediaRecorder.onpause = () => { setRecordingControls(true, true); setStatus("Recording paused."); };
+  mediaRecorder.onresume = () => { setRecordingControls(true, false); setStatus("Recording resumed."); };
+  mediaRecorder.onstop = async () => {
+    const blob = new Blob(recordedChunks, { type: mimeType });
+    const arrayBuffer = await blob.arrayBuffer();
+    const uint8 = Array.from(new Uint8Array(arrayBuffer));
+    const saveResult = await ipcRenderer.invoke("save-recording", uint8);
+    const savedPath = typeof saveResult === "string" ? saveResult : saveResult.filePath;
+
+    selectedMediaPath = savedPath;
+    segments = [];
+    activeSegmentIndex = -1;
+    setPlayer(savedPath, preferredType);
+    loadBookmarks();
+
+    setLectureTitle("Lecture Recording " + new Date().toLocaleString());
+    document.getElementById("segmentStat").innerText = "Segments: 0";
+    document.getElementById("finishedStat").innerText = "Finished: —";
+    transcriptPanel.innerHTML = '<div class="empty-state"><strong>Recording saved</strong><span>Press Transcribe to process your recording.</span></div>';
+    setStatus("Recording saved: " + getLectureTitle());
+    resetSteps();
+    setState("Idle");
+    resetStudyAssistant();
+    setRecordingControls(false, false);
+  };
+
+  mediaRecorder.start(1000);
+  setRecordingControls(true, false);
+  setStatus("🔴 " + recordingType + " recording...");
+}
+
+async function startMicRecording() {
+  errorBox.innerText = "";
+
+  if (voiceRecordingMode === "audio") {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        video: false
+      });
+      setupRecorder(stream, "Own voice", "audio");
+    } catch (err) {
+      errorBox.innerText = "Microphone recording error: " + err.message;
+    }
+    return;
+  }
+
+  let micStream = null;
+  let displayStream = null;
+
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      video: false
+    });
+
+    const shouldRecordDisplayAudio = voiceRecordingMode === "display_audio";
+
+    displayStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 30 },
+      audio: shouldRecordDisplayAudio
+    });
+
+    let finalAudioTracks = micStream.getAudioTracks();
+
+    if (shouldRecordDisplayAudio) {
+      const displayAudioTracks = displayStream.getAudioTracks();
+
+      if (!displayAudioTracks.length) {
+        throw new Error("No display/system audio track was provided. In the screen picker, choose a full screen/tab/window that supports audio and enable Share system audio if you see that option.");
+      }
+
+      const audioContext = new AudioContext();
+      const destination = audioContext.createMediaStreamDestination();
+
+      const micSource = audioContext.createMediaStreamSource(new MediaStream(micStream.getAudioTracks()));
+      const displayAudioSource = audioContext.createMediaStreamSource(new MediaStream(displayAudioTracks));
+
+      // Keep your microphone clearly hearable over the shared/display audio.
+      // Increase micGainValue if your voice is still low. Lower displayGainValue if the lecture/video is too loud.
+      const micGainValue = 1.15;
+      const displayGainValue = 0.28;
+
+      const micGain = audioContext.createGain();
+      const displayGain = audioContext.createGain();
+      micGain.gain.value = micGainValue;
+      displayGain.gain.value = displayGainValue;
+
+      micSource.connect(micGain).connect(destination);
+      displayAudioSource.connect(displayGain).connect(destination);
+
+      finalAudioTracks = destination.stream.getAudioTracks();
+    }
+
+    const mixedStream = new MediaStream([
+      ...displayStream.getVideoTracks(),
+      ...finalAudioTracks
+    ]);
+
+    setupRecorder(
+      mixedStream,
+      shouldRecordDisplayAudio ? "Own voice + display + display audio" : "Own voice + display",
+      "video"
+    );
+
+    const videoTrack = displayStream.getVideoTracks()[0];
+    if (videoTrack) videoTrack.onended = () => { stopRecording(); };
+  } catch (err) {
+    if (micStream) micStream.getTracks().forEach(track => track.stop());
+    if (displayStream) displayStream.getTracks().forEach(track => track.stop());
+    errorBox.innerText = (voiceRecordingMode === "display_audio" ? "Voice + Display + Display Audio" : "Voice + Display") + " recording error: " + err.message;
+  }
+}
+
+async function startOnlineClassRecording() {
+  errorBox.innerText = "";
+  if (onlineRecordingMode === "audio") {
+    try {
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+      const audioTracks = displayStream.getAudioTracks();
+      displayStream.getVideoTracks().forEach(track => track.stop());
+      if (!audioTracks.length) {
+        displayStream.getTracks().forEach(track => track.stop());
+        throw new Error("No system/screen audio track was provided by the selected source.");
+      }
+      const audioOnlyStream = new MediaStream(audioTracks);
+      setupRecorder(audioOnlyStream, "Online class screen audio", "audio");
+    } catch (err) {
+      errorBox.innerText = "Screen Audio Only recording error: " + err.message;
+    }
+    return;
+  }
+  try {
+    const displayStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+    setupRecorder(displayStream, "Online class display + screen audio", "video");
+    const videoTrack = displayStream.getVideoTracks()[0];
+    if (videoTrack) videoTrack.onended = () => { stopRecording(); };
+  } catch (err) {
+    errorBox.innerText = "Display + Screen Audio recording error: " + err.message;
+  }
+}
+
+function pauseRecording() {
+  if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.pause();
+}
+
+function resumeRecording() {
+  if (mediaRecorder && mediaRecorder.state === "paused") mediaRecorder.resume();
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+    if (mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track => track.stop());
+  }
+  setRecordingControls(false, false);
+}
+
+function transcribe() {
+  if (!selectedMediaPath) { alert("Choose or record audio/video first."); return; }
+  if (currentProcess) { alert("A transcription is already running."); return; }
+
+  const model = document.getElementById("modelSelect").value;
+  const scriptPath = path.join(__dirname, "transcribe.py");
+
+  document.getElementById("transcribeBtn").disabled = true;
+  document.getElementById("cancelBtn").disabled = false;
+  document.getElementById("modelStat").innerText = "Model: " + model;
+  document.getElementById("finishedStat").innerText = "Finished: —";
+  errorBox.innerText = "";
+  segments = [];
+  activeSegmentIndex = -1;
+  setStudyAssistantReady(false);
+  resetStudyAssistantOutputs();
+  setState("Processing");
+  resetSteps();
+  startTimer();
+  setStatus("Starting transcription with Whisper " + model + "…");
+  transcriptPanel.innerHTML = '<div class="empty-state"><strong>Processing…</strong><span>Please wait while the transcript is generated.</span></div>';
+
+  let stdout = "";
+  let stderr = "";
+  let wasCancelled = false;
+
+  currentProcess = spawn("python", [scriptPath, selectedMediaPath, model], { windowsHide: true });
+  currentProcess.stdout.on("data", data => { stdout += data.toString(); });
+  currentProcess.stderr.on("data", data => {
+    const chunk = data.toString();
+    stderr += chunk;
+    if (chunk.includes("STEP:CONVERT")) { setStep("convert", "Running"); setStatus("Converting media to clean audio…"); }
+    if (chunk.includes("STEP:LOAD_MODEL")) { setStep("load", "Running"); setStatus("Loading Whisper model…"); }
+    if (chunk.includes("STEP:TRANSCRIBE")) { setStep("transcribe", "Running"); setStatus("Transcribing speech…"); }
+    if (chunk.includes("STEP:RENDER")) { setStep("render", "Running"); setStatus("Rendering transcript…"); }
+  });
+  currentProcess.on("error", err => {
+    currentProcess = null;
+    document.getElementById("transcribeBtn").disabled = false;
+    document.getElementById("cancelBtn").disabled = true;
+    stopTimer("Failed after");
+    setState("Failed");
+    errorBox.innerText = "Could not start Python:\n" + err.message;
+    setStatus("Failed.");
+  });
+  currentProcess.on("close", code => {
+    currentProcess = null;
+    document.getElementById("transcribeBtn").disabled = false;
+    document.getElementById("cancelBtn").disabled = true;
+    if (wasCancelled) return;
+    if (code !== 0 && !stdout.trim()) {
+      stopTimer("Failed after"); setState("Failed");
+      errorBox.innerText = "Process failed with code " + code + "\n\n" + stderr;
+      setStatus("Failed."); return;
+    }
+    let data;
+    try { data = JSON.parse(stdout); } catch {
+      stopTimer("Failed after"); setState("Failed");
+      errorBox.innerText = "Invalid Python output:\n\n" + stdout + "\n\n" + stderr;
+      setStatus("Failed."); return;
+    }
+    if (!data.ok) {
+      stopTimer("Failed after"); setState("Failed");
+      errorBox.innerText = data.error; setStatus("Failed."); return;
+    }
+    setStep("render", "Running");
+    segments = data.segments || [];
+    renderTranscript(segments);
+    finishSteps();
+    stopTimer("Finished in");
+    document.getElementById("modelStat").innerText = "Model: " + data.model;
+    document.getElementById("segmentStat").innerText = "Segments: " + segments.length;
+    setState("Completed");
+    setStatus("Done. Language: " + data.language + " · Segments: " + segments.length);
+    transcriptPlainText = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
+    setStudyAssistantReady(true);
+  });
+  window.__cancelCurrentTranscription = () => { wasCancelled = true; };
+}
+
+function cancelTranscription() {
+  if (!currentProcess) return;
+  const pid = currentProcess.pid;
+  window.__cancelCurrentTranscription && window.__cancelCurrentTranscription();
+  if (process.platform === "win32") {
+    execFile("taskkill", ["/pid", String(pid), "/f", "/t"], () => {});
+  } else {
+    currentProcess.kill("SIGTERM");
+  }
+  currentProcess = null;
+  document.getElementById("transcribeBtn").disabled = false;
+  document.getElementById("cancelBtn").disabled = true;
+  stopTimer("Stopped after");
+  setState("Stopped");
+  setStatus("Transcription stopped by user.");
+  setProgress(0);
+}
+
+function renderTranscript(list) {
+  transcriptPanel.innerHTML = "";
+  if (!list.length) {
+    transcriptPanel.innerHTML = '<div class="empty-state"><strong>No speech detected</strong><span>Try a clearer recording or a stronger Whisper model.</span></div>';
+    return;
+  }
+  const query = document.getElementById("search").value.toLowerCase().trim();
+  list.forEach(seg => {
+    const originalIndex = typeof seg.originalIndex === "number" ? seg.originalIndex : segments.indexOf(seg);
+    const div = document.createElement("div");
+    div.className = "segment";
+    div.dataset.index = String(originalIndex);
+    div.dataset.start = String(seg.start);
+    div.dataset.end = String(seg.end);
+    const safeText = escapeHtml(seg.text);
+    const highlighted = query ? highlightText(safeText, query) : safeText;
+    div.innerHTML = '<button class="time-btn" title="Jump to this timestamp" role="button" tabindex="0">[' + seg.time + ']</button>' +
+      '<div class="segment-text" id="segmentText-' + originalIndex + '">' + highlighted +
+      '<div class="segment-actions">' +
+      '<button class="segment-mini-btn" onclick="event.stopPropagation(); editTranscriptSegment(' + originalIndex + ')">✏️ Edit</button>' +
+      '<button id="bookmarkBtn-' + originalIndex + '" class="segment-mini-btn' + (isSegmentBookmarked(originalIndex) ? ' is-bookmarked' : '') + '" onclick="event.stopPropagation(); addBookmarkFromSegment(' + originalIndex + ')">' + (isSegmentBookmarked(originalIndex) ? '⭐ Saved' : '🔖 Bookmark') + '</button>' +
+      '</div></div>';
+    const timeButton = div.querySelector(".time-btn");
+    timeButton.onclick = event => { event.stopPropagation(); jumpTo(seg.start, true); };
+    timeButton.onkeydown = event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); jumpTo(seg.start, true); } };
+    div.onclick = () => jumpTo(seg.start, true);
+    transcriptPanel.appendChild(div);
+  });
+  updateActiveSegment(false);
+  updateBookmarkButtons();
+}
+
+function refreshTranscriptPlainText() {
+  transcriptPlainText = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
+}
+
+function editTranscriptSegment(index) {
+  if (!segments[index]) return;
+  const box = document.getElementById("segmentText-" + index);
+  if (!box) return;
+  const currentText = segments[index].text || "";
+  box.innerHTML = '<div class="edit-segment-box">' +
+    '<textarea id="editSegmentInput-' + index + '">' + escapeHtml(currentText) + '</textarea>' +
+    '<div class="segment-actions">' +
+    '<button class="segment-mini-btn" onclick="event.stopPropagation(); saveTranscriptSegmentEdit(' + index + ')">✅ Save</button>' +
+    '<button class="segment-mini-btn" onclick="event.stopPropagation(); renderTranscript(segments)">Cancel</button>' +
+    '</div></div>';
+  const input = document.getElementById("editSegmentInput-" + index);
+  input.focus();
+  input.selectionStart = input.value.length;
+  input.selectionEnd = input.value.length;
+}
+
+function saveTranscriptSegmentEdit(index) {
+  const input = document.getElementById("editSegmentInput-" + index);
+  if (!input || !segments[index]) return;
+  segments[index].text = input.value.trim() || segments[index].text;
+  refreshTranscriptPlainText();
+  renderTranscript(segments);
+  resetStudyAssistantOutputs();
+  setStudyAssistantReady(true);
+  setStatus("Transcript line edited. AI outputs were reset because the transcript changed.");
+}
+
+function editActiveTranscriptSegment() {
+  if (activeSegmentIndex >= 0) editTranscriptSegment(activeSegmentIndex);
+}
+
+function hashText(value) {
+  let hash = 0;
+  const text = String(value || "");
+  for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+  return Math.abs(hash).toString(36);
+}
+
+function getLectureStorageKey() {
+  const source = selectedMediaPath || currentFileName || (segments.length ? hashText(transcriptPlainText || JSON.stringify(segments.slice(0, 5))) : "unsaved");
+  return "lectureNoteStudio.bookmarks." + source;
+}
+
+function loadBookmarks() {
+  try { transcriptBookmarks = JSON.parse(localStorage.getItem(getLectureStorageKey()) || "[]"); }
+  catch { transcriptBookmarks = []; }
+  renderBookmarks();
+}
+
+function saveBookmarks() {
+  try { localStorage.setItem(getLectureStorageKey(), JSON.stringify(transcriptBookmarks)); }
+  catch {}
+}
+
+function addBookmarkAtCurrentTime() {
+  const player = getCurrentPlayer();
+  if (!player && !segments.length) { alert("Choose or record media first."); return; }
+  const seconds = player ? (player.currentTime || 0) : 0;
+  const nearest = getNearestSegment(seconds);
+  addBookmark(seconds, nearest ? nearest.time : secondsToTimestamp(seconds), nearest ? nearest.text : "Important moment", nearest ? segments.indexOf(nearest) : -1);
+}
+
+function addBookmarkFromSegment(index) {
+  const seg = segments[index];
+  if (!seg) return;
+  addBookmark(seg.start, seg.time, seg.text, index);
+}
+
+function addBookmark(seconds, time, defaultText, segmentIndex = -1) {
+  const normalizedSeconds = Number(seconds) || 0;
+  const existingIndex = transcriptBookmarks.findIndex(bm => Math.abs((Number(bm.seconds) || 0) - normalizedSeconds) < 0.75);
+  if (existingIndex >= 0) {
+    setStatus("This timestamp is already bookmarked.");
+    jumpTo(transcriptBookmarks[existingIndex].seconds, true);
+    return;
+  }
+  transcriptBookmarks.push({
+    id: Date.now(),
+    seconds: normalizedSeconds,
+    time: time || secondsToTimestamp(normalizedSeconds),
+    note: (defaultText || "Important moment").trim().slice(0, 140) || "Bookmark",
+    segmentIndex
+  });
+  transcriptBookmarks.sort((a, b) => (Number(a.seconds) || 0) - (Number(b.seconds) || 0));
+  saveBookmarks();
+  renderBookmarks();
+  updateBookmarkButtons();
+  setStatus("Bookmark saved at " + (time || secondsToTimestamp(normalizedSeconds)) + ".");
+}
+
+function renderBookmarks() {
+  const mount = document.getElementById("bookmarkList");
+  if (!mount) return;
+  if (!transcriptBookmarks.length) {
+    mount.innerHTML = '<div class="empty-state" style="padding:14px;"><span>No bookmarks yet. Press B or click Bookmark.</span></div>';
+    return;
+  }
+  mount.innerHTML = transcriptBookmarks.map((bm, i) =>
+    '<div class="bookmark-item">' +
+    '<button class="time-btn" onclick="event.stopPropagation(); jumpTo(' + Number(bm.seconds || 0) + ', true)">[' + escapeHtml(bm.time || secondsToTimestamp(bm.seconds || 0)) + ']</button>' +
+    '<div class="bookmark-note" title="' + escapeHtml(bm.note || "Bookmark") + '">' + escapeHtml(bm.note || "Bookmark") + '</div>' +
+    '<button class="segment-mini-btn" onclick="event.stopPropagation(); deleteBookmark(' + i + ')">✕</button>' +
+    '</div>'
+  ).join("");
+}
+
+function deleteBookmark(index) {
+  transcriptBookmarks.splice(index, 1);
+  saveBookmarks();
+  renderBookmarks();
+  updateBookmarkButtons();
+}
+
+function clearBookmarks() {
+  if (!transcriptBookmarks.length) return;
+  if (!confirm("Clear all bookmarks for this lecture?")) return;
+  transcriptBookmarks = [];
+  saveBookmarks();
+  renderBookmarks();
+  updateBookmarkButtons();
+}
+
+function isSegmentBookmarked(index) {
+  const seg = segments[index];
+  if (!seg) return false;
+  return transcriptBookmarks.some(bm => Math.abs((Number(bm.seconds) || 0) - Number(seg.start || 0)) < 0.75);
+}
+
+function updateBookmarkButtons() {
+  segments.forEach((_, index) => {
+    const btn = document.getElementById("bookmarkBtn-" + index);
+    if (!btn) return;
+    const saved = isSegmentBookmarked(index);
+    btn.classList.toggle("is-bookmarked", saved);
+    btn.textContent = saved ? "⭐ Saved" : "🔖 Bookmark";
+  });
+}
+
+function getNearestSegment(seconds) {
+  if (!segments.length) return null;
+  return segments.find((seg, i) => seconds >= seg.start && (!segments[i + 1] || seconds < segments[i + 1].start)) || segments[0];
+}
+
+function secondsToTimestamp(seconds) {
+  seconds = Math.max(0, Math.floor(Number(seconds) || 0));
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return h > 0 ? String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0") : String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+
+function togglePlayback() {
+  const player = getCurrentPlayer();
+  if (!player || !selectedMediaPath) return;
+  if (player.paused) {
+    const playPromise = player.play();
+    if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
+  } else {
+    player.pause();
+  }
+}
+
+function stopPlayback() {
+  const player = getCurrentPlayer();
+  if (!player || !selectedMediaPath) return;
+  player.pause();
+  updateActiveSegment(true);
+  setStatus("Playback paused.");
+}
+
+function seekRelative(delta) {
+  const player = getCurrentPlayer();
+  if (!player || !selectedMediaPath) return;
+  player.currentTime = Math.max(0, (player.currentTime || 0) + delta);
+  updateActiveSegment(true);
+}
+
+function setPlayerVolume(value) {
+  const player = getCurrentPlayer();
+  if (!player) return;
+  const volume = Math.max(0, Math.min(1, Number(value) / 100));
+  player.volume = volume;
+  const text = document.getElementById("volumeText");
+  if (text) text.textContent = Math.round(volume * 100) + "%";
+}
+
+function syncVolumeUi() {
+  const player = getCurrentPlayer();
+  if (!player) return;
+  const value = Math.round((player.volume ?? 1) * 100);
+  const slider = document.getElementById("volumeSlider");
+  const text = document.getElementById("volumeText");
+  if (slider) slider.value = value;
+  if (text) text.textContent = value + "%";
+}
+
+function volumeRelative(delta) {
+  const player = getCurrentPlayer();
+  if (!player) return;
+  player.volume = Math.max(0, Math.min(1, (player.volume ?? 1) + delta));
+  syncVolumeUi();
+renderLectureLibrary();
+  setStatus("Volume: " + Math.round(player.volume * 100) + "%");
+}
+
+function parseTimestampToSeconds(value) {
+  const match = String(value || "").match(/(\d{1,2}:)?\d{1,2}:\d{2}|\d+(?:\.\d+)?/);
+  if (!match) return null;
+  const raw = match[0];
+  if (!raw.includes(":")) return Number(raw);
+  const parts = raw.split(":").map(Number);
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  return null;
+}
+
+function jumpToQuizTimestamp(qIndex) {
+  if (!quizData || !quizData.questions[qIndex]) return;
+  const seconds = parseTimestampToSeconds(quizData.questions[qIndex].timestamp);
+  if (seconds !== null && Number.isFinite(seconds)) jumpTo(seconds, true);
+}
+
+function searchTranscript() {
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  if (!q) { renderTranscript(segments); return; }
+  const filtered = segments.map((seg, index) => ({ ...seg, originalIndex: index })).filter(seg => seg.text.toLowerCase().includes(q) || seg.time.includes(q));
+  renderTranscript(filtered);
+}
+
+function jumpTo(seconds, shouldScrollToLine = false) {
+  const player = getCurrentPlayer();
+  if (!player || !selectedMediaPath) return;
+  player.currentTime = Math.max(0, Number(seconds) || 0);
+  updateActiveSegment(shouldScrollToLine);
+  const playPromise = player.play();
+  if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
+}
+
+function jumpToInput() {
+  const raw = document.getElementById("jumpInput").value.trim();
+  if (!raw) return;
+  let seconds = 0;
+  if (raw.includes(":")) {
+    const parts = raw.split(":").map(Number);
+    if (parts.length === 2) seconds = parts[0] * 60 + parts[1];
+    if (parts.length === 3) seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else { seconds = Number(raw); }
+  if (Number.isFinite(seconds)) jumpTo(seconds, true);
+}
+
+function getCurrentPlayer() {
+  return currentMediaKind === "video" ? videoPlayer : audioPlayer;
+}
+
+function updateActiveSegment(forceScroll = false) {
+  if (!segments.length) return;
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  if (q) return;
+  const player = getCurrentPlayer();
+  if (!player) return;
+  const currentTime = player.currentTime || 0;
+  let index = -1;
+  for (let i = 0; i < segments.length; i++) {
+    const current = segments[i];
+    const next = segments[i + 1];
+    if (currentTime >= current.start && (!next || currentTime < next.start)) { index = i; break; }
+  }
+  if (index === -1 && currentTime < segments[0].start) index = 0;
+  if (index === activeSegmentIndex && !forceScroll) return;
+  activeSegmentIndex = index;
+  document.querySelectorAll(".segment").forEach(el => el.classList.remove("active"));
+  if (index >= 0) {
+    const active = transcriptPanel.querySelector('.segment[data-index="' + index + '"]');
+    if (active) {
+      active.classList.add("active");
+      const allowedToScroll = forceScroll || (autoFollowTranscript && !userIsManuallyScrollingTranscript);
+      if (allowedToScroll) active.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+}
+
+audioPlayer.addEventListener("timeupdate", () => updateActiveSegment(false));
+videoPlayer.addEventListener("timeupdate", () => updateActiveSegment(false));
+
+function toggleAutoFollow() {
+  autoFollowTranscript = document.getElementById("autoFollowToggle").checked;
+  if (autoFollowTranscript) { setStatus("Auto-follow enabled."); updateActiveSegment(true); }
+  else setStatus("Auto-follow disabled. Scroll freely while playback continues.");
+}
+
+function setView(viewId) {
+  document.querySelectorAll(".nav-item").forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
+  document.querySelectorAll(".page-view").forEach(section => section.classList.toggle("active", section.id === viewId));
+}
+
+function setStudyTab(tabId) {
+  document.querySelectorAll(".study-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
+  document.querySelectorAll(".study-pane").forEach(pane => pane.classList.toggle("active", pane.id === tabId));
+}
+
+function extractJson(text) {
+  const trimmed = (text || "").trim();
+  if (!trimmed) throw new Error("Empty response from Llama.");
+  try { return JSON.parse(trimmed); } catch (e) {}
+  if (trimmed.includes("```")) {
+    const parts = trimmed.split("```");
+    for (const part of parts) {
+      const cleaned = part.replace(/^json\s*/i, "").trim();
+      if (!cleaned) continue;
+      try { return JSON.parse(cleaned); } catch (e) {}
+    }
+  }
+  const first = trimmed.indexOf("{");
+  const last = trimmed.lastIndexOf("}");
+  if (first !== -1 && last !== -1 && last > first) return JSON.parse(trimmed.slice(first, last + 1));
+  throw new Error("Could not parse JSON response from Llama.");
+}
+
+async function callGroqJSON(prompt, options = {}) {
+  const apiKey = getGroqApiKey();
+  const mode = options.mode || "compact";
+  const context = buildLectureContext(mode, options.question || "");
+  const systemText = options.system || "You are a high-quality university study assistant. Use the lecture as the main source. You may use general knowledge only when it helps explain the same lecture topic. Return only valid JSON. Do not include markdown fences or extra commentary.";
+  const combinedPrompt = context + "\n\nTASK:\n" + prompt;
+  const response = await fetch(GROQ_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [
+        { role: "system", content: systemText },
+        { role: "user", content: combinedPrompt }
+      ],
+      temperature: options.temperature ?? 0.25,
+      max_tokens: options.max_tokens || 3500,
+      response_format: { type: "json_object" }
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.error?.message || ("Groq API request failed with status " + response.status));
+  const text = (data.choices?.[0]?.message?.content || "").trim();
+  return extractJson(text);
+}
+
+function renderSummaryOutput(text) {
+  document.getElementById("summaryOutput").innerHTML = "<div style='padding:4px'>" + formatAiHtml(text) + "</div>";
+}
+
+function normalizeQuizAnswer(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[“”"'`]/g, "")
+    .replace(/[^a-z0-9\s\-]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getQuizAcceptedAnswers(question) {
+  const accepted = [];
+  if (Array.isArray(question.acceptedAnswers)) accepted.push(...question.acceptedAnswers);
+  if (question.answer !== undefined && question.answer !== null) accepted.push(question.answer);
+  return [...new Set(accepted.map(x => String(x || "").trim()).filter(Boolean))];
+}
+
+function getQuizAnswerText(question, rawAnswer) {
+  if (typeof rawAnswer === "number" && Array.isArray(question.options)) return String(question.options[rawAnswer] || "");
+  return String(rawAnswer || "");
+}
+
+function isQuizAnswered(value) {
+  return value !== undefined && String(value).trim() !== "";
+}
+
+function isQuizCorrect(question, rawAnswer) {
+  if (!isQuizAnswered(rawAnswer)) return false;
+  const user = normalizeQuizAnswer(getQuizAnswerText(question, rawAnswer));
+  return getQuizAcceptedAnswers(question).some(ans => normalizeQuizAnswer(ans) === user);
+}
+
+function renderQuizInterface() {
+  const mount = document.getElementById("quizOutput");
+  if (!quizData || !Array.isArray(quizData.questions) || !quizData.questions.length) {
+    mount.innerHTML = '<div class="empty-state"><strong>No quiz data</strong><span>Try generating the quiz again.</span></div>';
+    return;
+  }
+  const q = quizData.questions[quizCurrentIndex];
+  const total = quizData.questions.length;
+  const currentAnswer = quizUserAnswers[quizCurrentIndex];
+  const qType = String(q.type || "Question");
+  const isFillBlank = qType.toLowerCase().includes("fill") && qType.toLowerCase().includes("blank");
+  const hasOptions = Array.isArray(q.options) && q.options.length > 0;
+  const optionsHtml = hasOptions ? q.options.map((opt, idx) => {
+    const isSelected = currentAnswer === idx;
+    return `<button class="quiz-option ${isSelected ? "selected" : ""}" onclick="selectQuizOption(${quizCurrentIndex}, ${idx})"><span class="quiz-option-label">${String.fromCharCode(65 + idx)}</span><span>${escapeHtml(opt)}</span></button>`;
+  }).join("") : "";
+  const accepted = getQuizAcceptedAnswers(q);
+  const correctText = accepted[0] || String(q.answer || "").trim();
+  const userAnswerText = getQuizAnswerText(q, currentAnswer);
+  const isAnswered = isQuizAnswered(currentAnswer);
+  const isCorrect = isQuizCorrect(q, currentAnswer);
+  const answered = quizData.questions.filter((_, i) => isQuizAnswered(quizUserAnswers[i])).length;
+  const correctCount = quizData.questions.filter((question, i) => isQuizCorrect(question, quizUserAnswers[i])).length;
+  const inputHtml = hasOptions
+    ? `<div class="quiz-options">${optionsHtml}</div>`
+    : isFillBlank
+      ? `<div class="quiz-input-shell"><div class="fill-blank-note">Type the missing word or phrase.</div><input id="quizTextInput-${quizCurrentIndex}" class="fill-blank-input" type="text" placeholder="Fill in the blank…" value="${escapeHtml(typeof currentAnswer === "string" ? currentAnswer : "")}" oninput="setQuizTextAnswer(${quizCurrentIndex}, this.value)"></div>`
+      : `<div class="quiz-input-shell"><div class="fill-blank-note">Type your answer below.</div><textarea id="quizTextInput-${quizCurrentIndex}" class="essay-box" placeholder="Type your answer…" oninput="setQuizTextAnswer(${quizCurrentIndex}, this.value)">${escapeHtml(typeof currentAnswer === "string" ? currentAnswer : "")}</textarea></div>`;
+  const feedbackHtml = isAnswered ? `<div class="quiz-feedback ${isCorrect ? "good" : "bad"}"><strong>${isCorrect ? "✅ Correct" : "❌ Wrong"}</strong>${isCorrect ? "" : `<br>Your answer: ${escapeHtml(userAnswerText || "—")}<br>Correct answer: ${escapeHtml(correctText || "—")}`}<br><br>${formatAiHtml(q.explanation || "No explanation provided.")}${q.timestamp ? `<br><br><button class="btn btn-ghost btn-sm" onclick="jumpToQuizTimestamp(${quizCurrentIndex})">⏱ Open transcript at ${escapeHtml(q.timestamp)}</button>` : ""}</div>` : "";
+  const revealHtml = q.showAnswer ? `<div class="quiz-answer-card"><div class="quiz-answer-title">Answer & Explanation</div><div class="quiz-answer-body"><strong>Correct answer:</strong> ${escapeHtml(String(correctText || ""))}<br><br>${formatAiHtml(q.explanation || "No explanation provided.")}</div>${q.timestamp ? `<div class="quiz-answer-meta"><button class="btn btn-ghost btn-sm" onclick="jumpToQuizTimestamp(${quizCurrentIndex})">⏱ Open transcript at ${escapeHtml(q.timestamp)}</button></div>` : ""}</div>` : feedbackHtml;
+  mount.innerHTML = `<div class="quiz-shell">
+    <div class="quiz-header">
+      <div><div class="quiz-kicker">Interactive Quiz</div><h4>${escapeHtml(quizData.title || "Lecture Quiz")}</h4><div class="quiz-meta">Question ${quizCurrentIndex + 1} of ${total} · ${answered}/${total} answered · ${correctCount} correct</div></div>
+      <div class="quiz-nav"><button class="btn btn-ghost btn-sm" ${quizCurrentIndex === 0 ? "disabled" : ""} onclick="changeQuizQuestion(-1)">← Prev</button><button class="btn btn-ghost btn-sm" ${quizCurrentIndex === total - 1 ? "disabled" : ""} onclick="changeQuizQuestion(1)">Next →</button></div>
+    </div>
+    <div class="quiz-progress"><span style="width:${((quizCurrentIndex + 1) / total) * 100}%"></span></div>
+    <div class="quiz-card">
+      <div class="quiz-type-badge">${escapeHtml(qType)}</div>
+      <div class="quiz-question-text">${escapeHtml(q.question || "")}</div>
+      ${inputHtml}
+      <div class="quiz-actions">
+        <button class="btn btn-teal btn-sm" onclick="toggleQuizAnswer(${quizCurrentIndex})">${q.showAnswer ? "Hide Answer" : "Reveal Answer"}</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetCurrentQuizAnswer(${quizCurrentIndex})">Clear Response</button>
+      </div>
+      ${revealHtml}
+    </div>
+    <div class="quiz-dots">${quizData.questions.map((_, i) => `<button class="quiz-dot ${i === quizCurrentIndex ? "active" : ""} ${isQuizAnswered(quizUserAnswers[i]) ? "done" : ""}" onclick="goToQuizQuestion(${i})">${i + 1}</button>`).join("")}</div>
+  </div>`;
+}
+
+function selectQuizOption(qIndex, optionIndex) { quizUserAnswers[qIndex] = optionIndex; renderQuizInterface(); }
+function setQuizTextAnswer(qIndex, value) { quizUserAnswers[qIndex] = value; }
+function resetCurrentQuizAnswer(qIndex) { delete quizUserAnswers[qIndex]; renderQuizInterface(); }
+function toggleQuizAnswer(qIndex) { if (!quizData || !quizData.questions[qIndex]) return; quizData.questions[qIndex].showAnswer = !quizData.questions[qIndex].showAnswer; renderQuizInterface(); }
+function changeQuizQuestion(delta) { if (!quizData) return; quizCurrentIndex = Math.max(0, Math.min(quizData.questions.length - 1, quizCurrentIndex + delta)); renderQuizInterface(); }
+function goToQuizQuestion(index) { quizCurrentIndex = index; renderQuizInterface(); }
+
+
+function renderFlashcardInterface() {
+  const mount = document.getElementById("flashcardsOutput");
+  if (!flashcardData || !Array.isArray(flashcardData.cards) || !flashcardData.cards.length) {
+    mount.innerHTML = '<div class="empty-state"><strong>No flashcards yet</strong><span>Generate a flashcard deck to start studying.</span></div>';
+    return;
+  }
+  const total = flashcardData.cards.length;
+  const card = flashcardData.cards[flashCurrentIndex];
+  mount.innerHTML = `<div class="flash-shell">
+    <div class="quiz-header">
+      <div><div class="quiz-kicker">Interactive Flashcards</div><h4>${escapeHtml(flashcardData.title || "Lecture Flashcards")}</h4><div class="quiz-meta">Card ${flashCurrentIndex + 1} of ${total}</div></div>
+      <div class="quiz-nav"><button class="btn btn-ghost btn-sm" ${flashCurrentIndex === 0 ? "disabled" : ""} onclick="changeFlashcard(-1)">← Prev</button><button class="btn btn-ghost btn-sm" ${flashCurrentIndex === total - 1 ? "disabled" : ""} onclick="changeFlashcard(1)">Next →</button></div>
+    </div>
+    <div class="flashcard-stage">
+      <div class="flashcard ${card.flipped ? "flipped" : ""}" onclick="flipCurrentFlashcard()">
+        <div class="flashcard-face flashcard-front"><div class="flashcard-kicker">Front</div><div class="flashcard-text">${escapeHtml(card.front || "")}</div><div class="flashcard-tip">Click card to flip →</div></div>
+        <div class="flashcard-face flashcard-back"><div class="flashcard-kicker">Back</div><div class="flashcard-text">${escapeHtml(card.back || "")}</div><div class="flashcard-tip">← Click to flip back</div></div>
+      </div>
+    </div>
+    <div class="quiz-actions">
+      <button class="btn btn-purple btn-sm" onclick="flipCurrentFlashcard()">Flip Card</button>
+      <button class="btn btn-ghost btn-sm" onclick="shuffleFlashcards()">Shuffle</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetFlashcards()">Reset</button>
+    </div>
+    <div class="flashcard-grid-mini">${flashcardData.cards.map((_, i) => `<button class="flash-mini ${i === flashCurrentIndex ? "active" : ""}" onclick="goToFlashcard(${i})">${i + 1}</button>`).join("")}</div>
+  </div>`;
+}
+
+function flipCurrentFlashcard() { if (!flashcardData || !flashcardData.cards[flashCurrentIndex]) return; flashcardData.cards[flashCurrentIndex].flipped = !flashcardData.cards[flashCurrentIndex].flipped; renderFlashcardInterface(); }
+function changeFlashcard(delta) { if (!flashcardData) return; flashCurrentIndex = Math.max(0, Math.min(flashcardData.cards.length - 1, flashCurrentIndex + delta)); renderFlashcardInterface(); }
+function goToFlashcard(index) { flashCurrentIndex = index; renderFlashcardInterface(); }
+function shuffleFlashcards() { if (!flashcardData) return; for (let i = flashcardData.cards.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [flashcardData.cards[i], flashcardData.cards[j]] = [flashcardData.cards[j], flashcardData.cards[i]]; } flashCurrentIndex = 0; renderFlashcardInterface(); }
+function resetFlashcards() { if (!flashcardData) return; flashcardData.cards.forEach(card => card.flipped = false); flashCurrentIndex = 0; renderFlashcardInterface(); }
+
+
+function shuffleArray(items) {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function normalizeMatchingPairs(rawPairs) {
+  return (rawPairs || []).map((pair, index) => ({
+    id: pair.id || ("pair-" + index + "-" + Math.random().toString(36).slice(2, 7)),
+    concept: String(pair.concept || pair.term || pair.front || "Concept " + (index + 1)).trim(),
+    match: String(pair.match || pair.definition || pair.back || pair.answer || "").trim(),
+    matched: !!pair.matched,
+    correct: false,
+    wrong: false
+  })).filter(pair => pair.concept && pair.match);
+}
+
+function prepareMatchingGame(data) {
+  const pairs = normalizeMatchingPairs(data?.pairs || []);
+  const ids = pairs.map(pair => pair.id);
+  return {
+    title: data?.title || "Lecture Matching Game",
+    pairs,
+    conceptsOrder: data?.conceptsOrder && data.conceptsOrder.length === ids.length ? data.conceptsOrder : shuffleArray(ids),
+    matchesOrder: data?.matchesOrder && data.matchesOrder.length === ids.length ? data.matchesOrder : shuffleArray(ids)
+  };
+}
+
+function renderMatchingGame() {
+  const mount = document.getElementById("matchingOutput");
+  if (!mount) return;
+  if (!matchingData || !Array.isArray(matchingData.pairs) || !matchingData.pairs.length) {
+    mount.innerHTML = '<div class="empty-state"><strong>No matching game yet</strong><span>Choose your options and click Generate Matching Game.</span></div>';
+    return;
+  }
+  const pairsById = Object.fromEntries(matchingData.pairs.map(pair => [pair.id, pair]));
+  const total = matchingData.pairs.length;
+  const matched = matchingData.pairs.filter(pair => pair.matched).length;
+  const accuracy = matchingStats.attempts ? Math.round((matched / matchingStats.attempts) * 100) : 100;
+  const conceptCards = matchingData.conceptsOrder.map((id, idx) => {
+    const pair = pairsById[id];
+    if (!pair) return "";
+    return `<button class="match-card ${matchingSelected.concept === id ? "selected" : ""} ${pair.matched ? "matched" : ""} ${pair.wrong ? "wrong" : ""} ${pair.correct ? "correct" : ""}" onclick="selectMatchingCard('concept','${id}')" ${pair.matched ? "disabled" : ""}><small>Concept ${idx + 1}</small>${escapeHtml(pair.concept)}</button>`;
+  }).join("");
+  const matchCards = matchingData.matchesOrder.map((id, idx) => {
+    const pair = pairsById[id];
+    if (!pair) return "";
+    return `<button class="match-card ${matchingSelected.match === id ? "selected" : ""} ${pair.matched ? "matched" : ""} ${pair.wrong ? "wrong" : ""} ${pair.correct ? "correct" : ""}" onclick="selectMatchingCard('match','${id}')" ${pair.matched ? "disabled" : ""}><small>Definition ${idx + 1}</small>${escapeHtml(pair.match)}</button>`;
+  }).join("");
+  const completeHtml = matched === total ? `<div class="matching-complete"><strong>🏆 Completed!</strong><br>You matched all ${total} pairs. Attempts: ${matchingStats.attempts}. Best streak: ${matchingStats.bestStreak}.</div>` : "";
+  mount.innerHTML = `<div class="matching-shell">
+    <div class="matching-hero">
+      <div><div class="quiz-kicker">3D AI Matching Game</div><h4>${escapeHtml(matchingData.title || "Lecture Matching Game")}</h4><div class="quiz-meta">Match each concept with the best definition, event, role, cause, or effect.</div></div>
+      <div class="matching-stats"><div class="matching-stat"><strong>${matched}/${total}</strong>matched</div><div class="matching-stat"><strong>${matchingStats.attempts}</strong>attempts</div><div class="matching-stat"><strong>${matchingStats.streak}</strong>streak</div><div class="matching-stat"><strong>${accuracy}%</strong>accuracy</div></div>
+    </div>
+    <div class="matching-message ${matchingStats.messageType || ""}">${escapeHtml(matchingStats.message || "Pick one concept and one definition to match them.")}</div>
+    ${completeHtml}
+    <div class="matching-actions"><button class="btn btn-purple btn-sm" onclick="shuffleMatchingBoard()">Shuffle Board</button><button class="btn btn-ghost btn-sm" onclick="resetMatchingGame()">Reset Game</button></div>
+    <div class="matching-board"><div class="matching-column"><div class="matching-column-title">Concept Cards</div>${conceptCards}</div><div class="matching-column"><div class="matching-column-title">Definition Cards</div>${matchCards}</div></div>
+  </div>`;
+}
+
+function selectMatchingCard(kind, id) {
+  if (!matchingData?.pairs) return;
+  const pair = matchingData.pairs.find(item => item.id === id);
+  if (!pair || pair.matched) return;
+  matchingData.pairs.forEach(item => { item.wrong = false; item.correct = false; });
+  matchingSelected[kind] = matchingSelected[kind] === id ? null : id;
+  if (matchingSelected.concept && matchingSelected.match) checkMatchingSelection();
+  renderMatchingGame();
+}
+
+function checkMatchingSelection() {
+  const conceptId = matchingSelected.concept;
+  const matchId = matchingSelected.match;
+  matchingStats.attempts += 1;
+  if (conceptId === matchId) {
+    const pair = matchingData.pairs.find(item => item.id === conceptId);
+    if (pair) { pair.matched = true; pair.correct = true; }
+    matchingStats.streak += 1;
+    matchingStats.bestStreak = Math.max(matchingStats.bestStreak, matchingStats.streak);
+    matchingStats.message = "Correct match! Keep the streak going.";
+    matchingStats.messageType = "good";
+  } else {
+    const conceptPair = matchingData.pairs.find(item => item.id === conceptId);
+    const matchPair = matchingData.pairs.find(item => item.id === matchId);
+    if (conceptPair) conceptPair.wrong = true;
+    if (matchPair) matchPair.wrong = true;
+    matchingStats.streak = 0;
+    matchingStats.message = "Not a match. Try another connection.";
+    matchingStats.messageType = "bad";
+  }
+  matchingSelected = { concept: null, match: null };
+}
+
+function shuffleMatchingBoard() {
+  if (!matchingData?.pairs) return;
+  const ids = matchingData.pairs.map(pair => pair.id);
+  matchingData.conceptsOrder = shuffleArray(ids);
+  matchingData.matchesOrder = shuffleArray(ids);
+  matchingSelected = { concept: null, match: null };
+  matchingStats.message = "Board shuffled. Pick a new concept and definition.";
+  matchingStats.messageType = "";
+  renderMatchingGame();
+}
+
+function resetMatchingGame() {
+  if (!matchingData?.pairs) return;
+  matchingData.pairs = matchingData.pairs.map(pair => ({ ...pair, matched: false, correct: false, wrong: false }));
+  matchingSelected = { concept: null, match: null };
+  matchingStats = { attempts: 0, streak: 0, bestStreak: 0, message: "Game reset. Pick one concept and one definition to match them.", messageType: "" };
+  shuffleMatchingBoard();
+}
+
+function getGroqApiKey() { return (document.getElementById("groqApiKey").value || "").trim(); }
+
+function loadGroqKey() {
+  const saved = localStorage.getItem("lectureNoteStudio.groqApiKey") || "";
+  const input = document.getElementById("groqApiKey");
+  if (input && saved) input.value = saved;
+  updateApiKeyBadge();
+}
+
+function updateApiKeyBadge() {
+  const hasKey = !!getGroqApiKey();
+  const badge = document.getElementById("apiKeyBadge");
+  badge.textContent = hasKey ? "Groq key saved" : "Groq key not saved";
+  badge.className = hasKey ? "tag ok" : "tag warn";
+}
+
+function saveGroqKey() {
+  const key = getGroqApiKey();
+  localStorage.setItem("lectureNoteStudio.groqApiKey", key);
+  updateApiKeyBadge();
+  setStatus(key ? "Groq API key saved locally on this device." : "Groq API key cleared.");
+}
+
+function setStudyAssistantReady(isReady) {
+  const readyBadge = document.getElementById("assistantReadyBadge");
+  readyBadge.innerHTML = '<span class="status-dot"></span>' + (isReady ? "Transcript ready" : "Transcript required");
+  document.querySelectorAll(".ai-action").forEach(btn => { btn.disabled = !isReady; });
+  document.getElementById("chatStatus").textContent = isReady ? "Transcript ready. Ask anything." : "Ready after transcript is finished.";
+}
+
+function resetStudyAssistantOutputs() {
+  document.getElementById("summaryOutput").innerHTML = '<div class="empty-state"><strong>No summary yet</strong><span>Generate a transcript first, then click Generate Summary.</span></div>';
+  document.getElementById("quizOutput").innerHTML = '<div class="empty-state"><strong>No quiz yet</strong><span>Choose your options and click Generate Quiz.</span></div>';
+  document.getElementById("flashcardsOutput").innerHTML = '<div class="empty-state"><strong>No flashcards yet</strong><span>Choose your options and click Generate Flashcards.</span></div>';
+  if (document.getElementById("matchingOutput")) document.getElementById("matchingOutput").innerHTML = '<div class="empty-state"><strong>No matching game yet</strong><span>Choose your options and click Generate Matching Game.</span></div>';
+  quizData = null; quizUserAnswers = {}; quizCurrentIndex = 0; flashcardData = null; flashCurrentIndex = 0; matchingData = null; matchingSelected = { concept: null, match: null }; matchingStats = { attempts: 0, streak: 0, bestStreak: 0, message: "Pick one concept and one definition to match them.", messageType: "" };
+  document.getElementById("chatMessages").innerHTML = '<div class="chat-bubble assistant"><div class="chat-meta">Study Assistant</div>Once your transcript is ready, ask about the lecture or its wider topic.</div>';
+  document.getElementById("lectureQuestion").value = "";
+  document.getElementById("chatStatus").textContent = "Ready after transcript is finished.";
+  chatHistory = [];
+}
+
+function resetStudyAssistant() { transcriptPlainText = ""; setStudyAssistantReady(false); resetStudyAssistantOutputs(); }
+
+function ensureStudyAssistantReady() {
+  if (!segments.length) { alert("Finish transcription first."); return false; }
+  if (!getGroqApiKey()) { alert("Paste and save your Groq API key first."); return false; }
+  return true;
+}
+
+function showLoading(targetId, text) {
+  document.getElementById(targetId).innerHTML = '<div class="loading-state"><div class="spinner"></div><div>' + escapeHtml(text || "Generating…") + '</div></div>';
+}
+
+function formatAiHtml(text) {
+  let formatted = escapeHtml(text || "");
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  formatted = formatted.replace(/^###\s?(.*)$/gm, "<strong style='font-size:14px;display:block;margin:8px 0 4px;'>$1</strong>");
+  formatted = formatted.replace(/^##\s?(.*)$/gm, "<strong style='font-size:15px;display:block;margin:10px 0 5px;'>$1</strong>");
+  formatted = formatted.replace(/^#\s?(.*)$/gm, "<strong style='font-size:16px;display:block;margin:12px 0 6px;'>$1</strong>");
+  formatted = formatted.replace(/\n/g, "<br>");
+  return '<div class="ai-richtext">' + formatted + "</div>";
+}
+
+function normalizeForAI(text, maxChars = 12000) {
+  text = String(text || "").replace(/\s+/g, " ").trim();
+  if (text.length <= maxChars) return text;
+  return text.slice(0, maxChars) + "\n...[trimmed to save tokens]";
+}
+
+function getTranscriptForAI(maxChars = 22000) {
+  const raw = transcriptPlainText || segments.map(s => "[" + s.time + "] " + s.text).join("\n");
+  return normalizeForAI(raw, maxChars);
+}
+
+function getCompactTranscriptForAI(maxChars = 9000) {
+  if (!segments.length) return getTranscriptForAI(maxChars);
+  const target = [];
+  const step = Math.max(1, Math.ceil(segments.length / 80));
+  for (let i = 0; i < segments.length; i += step) {
+    target.push("[" + segments[i].time + "] " + segments[i].text);
+  }
+  return normalizeForAI(target.join("\n"), maxChars);
+}
+
+function getRelevantTranscriptForQuestion(question, maxSegments = 14, maxChars = 8000) {
+  if (!segments.length) return "";
+  const stop = new Set(["the","a","an","and","or","but","is","are","was","were","in","on","at","to","for","of","with","about","what","why","how","did","does","do","this","that","it","as","by","from","lecture","explain","tell","me"]);
+  const words = String(question || "").toLowerCase().match(/[a-z0-9]{3,}/g) || [];
+  const keywords = [...new Set(words.filter(w => !stop.has(w)))];
+  const scored = segments.map((seg, index) => {
+    const text = seg.text.toLowerCase();
+    let score = 0;
+    for (const kw of keywords) {
+      if (text.includes(kw)) score += 3;
+      const short = kw.slice(0, Math.max(4, Math.floor(kw.length * 0.7)));
+      if (short && text.includes(short)) score += 1;
+    }
+    return { seg, index, score };
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, maxSegments);
+
+  if (!scored.length) {
+    const step = Math.max(1, Math.ceil(segments.length / Math.min(maxSegments, 10)));
+    for (let i = 0; i < segments.length && scored.length < maxSegments; i += step) scored.push({ seg: segments[i], index: i, score: 0 });
+  }
+
+  scored.sort((a,b) => a.index - b.index);
+  return normalizeForAI(scored.map(x => "[" + x.seg.time + "] " + x.seg.text).join("\n"), maxChars);
+}
+
+function getLectureCacheKey() {
+  const title = getLectureTitle() || "untitled";
+  const lengthPart = segments.length + ":" + (transcriptPlainText || "").length;
+  return "lectureNoteStudio.aiCache." + title + "." + lengthPart;
+}
+
+function loadCachedAI(kind) {
+  try {
+    const raw = localStorage.getItem(getLectureCacheKey() + "." + kind);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function saveCachedAI(kind, value) {
+  try { localStorage.setItem(getLectureCacheKey() + "." + kind, JSON.stringify(value)); } catch (e) {}
+}
+
+function buildLectureContext(mode, question) {
+  const title = getLectureTitle();
+  const summary = cachedLectureSummaryForAI || (loadCachedAI("summaryText") || "");
+  if (mode === "chat") {
+    return "LECTURE TITLE:\n" + title + "\n\nLECTURE SUMMARY IF AVAILABLE:\n" + normalizeForAI(summary, 2500) + "\n\nRELEVANT TRANSCRIPT PARTS:\n" + getRelevantTranscriptForQuestion(question, 16, 9000);
+  }
+  if (mode === "compact") {
+    return "LECTURE TITLE:\n" + title + "\n\nCOMPACT TRANSCRIPT SAMPLE WITH TIMESTAMPS:\n" + getCompactTranscriptForAI(10000);
+  }
+  return "LECTURE TITLE:\n" + title + "\n\nLECTURE TRANSCRIPT:\n" + getTranscriptForAI(22000);
+}
+
+async function callGroqWithTranscript(prompt, options = {}) {
+  const apiKey = getGroqApiKey();
+  const mode = options.mode || "full";
+  const context = buildLectureContext(mode, options.question || "");
+  const systemText = options.system || "You are a high-quality university study tutor. The transcript defines the lecture topic, but you are NOT limited only to exact transcript facts. If the user asks anything inside the same broad topic or subject area, answer using your general knowledge too. Example: if the lecture is about the Cold War, answer broader Cold War questions about USA, USSR, Space Race, NATO, Berlin Wall, Cuban Missile Crisis, etc., even if that exact detail is not in the recording. Refuse only questions that are clearly outside the lecture's broad subject area. If your answer uses general knowledge beyond the transcript, briefly label it as broader context. Mention transcript timestamps only when the transcript directly supports the answer. Keep answers clear, direct, and useful for studying.";
+  const combinedPrompt = context + "\n\nTASK:\n" + prompt;
+  const response = await fetch(GROQ_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [
+        { role: "system", content: systemText },
+        { role: "user", content: combinedPrompt }
+      ],
+      temperature: options.temperature ?? 0.35,
+      max_tokens: options.max_tokens || 2500
+    })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.error?.message || ("Groq API request failed with status " + response.status));
+  const outText = (data.choices?.[0]?.message?.content || "").trim();
+  if (!outText) throw new Error("Llama returned an empty response.");
+  return outText;
+}
+
+async function generateSummary() {
+  if (!ensureStudyAssistantReady()) return;
+  const type = document.getElementById("summaryType").value;
+  const focus = document.getElementById("summaryFocus").value;
+  const button = document.getElementById("summaryBtn");
+  button.disabled = true;
+  showLoading("summaryOutput", "Generating summary…");
+  try {
+    const cached = loadCachedAI("summary:" + type + ":" + focus);
+    if (cached) {
+      cachedLectureSummaryForAI = cached;
+      renderSummaryOutput(cached + "\n\n_Cached result — no new tokens used._");
+      setStatus("Loaded cached summary without using tokens.");
+      return;
+    }
+    const prompt = "Create a " + type + " of this lecture. Primary focus: " + focus + ". Use clear sections and bullet points. Include core ideas, definitions, examples, and exam-relevant points. End with a short 'What to remember' section. Keep it useful but not too long.";
+    const result = await callGroqWithTranscript(prompt, { mode: "full", temperature: 0.25, max_tokens: 2200 });
+    cachedLectureSummaryForAI = result;
+    saveCachedAI("summary:" + type + ":" + focus, result);
+    saveCachedAI("summaryText", result);
+    renderSummaryOutput(result);
+    setStatus("Summary generated with Llama 3.1 8B Instant and cached.");
+  } catch (err) {
+    document.getElementById("summaryOutput").innerHTML = '<div class="empty-state"><strong>Summary failed</strong><span>' + escapeHtml(err.message) + "</span></div>";
+    errorBox.innerText = "Summary generation failed:\n" + err.message;
+  } finally { button.disabled = false; setStudyAssistantReady(!!segments.length); }
+}
+
+async function generateQuiz() {
+  if (!ensureStudyAssistantReady()) return;
+  const count = document.getElementById("quizCount").value;
+  const type = document.getElementById("quizType").value;
+  const difficulty = document.getElementById("quizDifficulty").value;
+  const button = document.getElementById("quizBtn");
+  button.disabled = true;
+  showLoading("quizOutput", "Generating interactive quiz…");
+  try {
+    const cacheKey = "quiz:" + count + ":" + type + ":" + difficulty;
+    const cached = loadCachedAI(cacheKey);
+    if (cached) {
+      quizData = cached;
+      quizData.questions = quizData.questions.map(q => ({ ...q, showAnswer: false }));
+      quizUserAnswers = {}; quizCurrentIndex = 0;
+      renderQuizInterface();
+      setStatus("Loaded cached quiz without using tokens.");
+      return;
+    }
+    const prompt = "Create a HIGH-QUALITY exam-style lecture quiz as JSON. Return a JSON object with keys: title, questions. questions must be an array of exactly " + count + " items. Each question object must have: type, question, options, answer, explanation, timestamp, acceptedAnswers. Requirements: questions must test understanding, cause/effect, comparison, application, and common mistakes — not simple copy-paste facts. Avoid obvious or repeated questions. For multiple choice and true/false, options must be a non-empty array and the correct answer must exactly match one option text. For short answer and fill in the blank, options must be an empty array. For fill in the blank, write the question with a clear blank like ___ and set answer to the exact missing word or phrase. acceptedAnswers must include the main answer and any equivalent spelling/phrasing. If quiz type is mixed, include multiple choice, true/false, short answer, and fill in the blank. The explanation must explain why the correct answer is right and why the likely confusion would be wrong. timestamp must be the closest transcript time like 12:40. Requested quiz type: " + type + ". Difficulty level: " + difficulty + ".";
+    quizData = await callGroqJSON(prompt, { mode: "compact", temperature: 0.2, max_tokens: 3800 });
+    if (!Array.isArray(quizData.questions)) throw new Error("Llama did not return a valid quiz.");
+    saveCachedAI(cacheKey, quizData);
+    quizData.questions = quizData.questions.map(q => ({ ...q, showAnswer: false }));
+    quizUserAnswers = {}; quizCurrentIndex = 0;
+    renderQuizInterface();
+    setStatus("Interactive quiz generated with Llama 3.1 8B Instant.");
+  } catch (err) {
+    document.getElementById("quizOutput").innerHTML = '<div class="empty-state"><strong>Quiz failed</strong><span>' + escapeHtml(err.message) + "</span></div>";
+    errorBox.innerText = "Quiz generation failed:\n" + err.message;
+  } finally { button.disabled = false; setStudyAssistantReady(!!segments.length); }
+}
+
+async function generateFlashcards() {
+  if (!ensureStudyAssistantReady()) return;
+  const count = document.getElementById("flashcardCount").value;
+  const focus = document.getElementById("flashcardFocus").value;
+  const button = document.getElementById("flashcardsBtn");
+  button.disabled = true;
+  showLoading("flashcardsOutput", "Generating flashcards…");
+  try {
+    const cacheKey = "flashcards:" + count + ":" + focus;
+    const cached = loadCachedAI(cacheKey);
+    if (cached) {
+      flashcardData = cached;
+      flashcardData.cards = flashcardData.cards.map(card => ({ ...card, flipped: false }));
+      flashCurrentIndex = 0;
+      renderFlashcardInterface();
+      setStatus("Loaded cached flashcards without using tokens.");
+      return;
+    }
+    const prompt = "Create a flashcard deck as JSON. Return a JSON object with keys: title, cards. cards must be an array of exactly " + count + " items. Each card object must have: front, back. Focus: " + focus + ". Make cards concise, exam-useful, and focused on concepts, definitions, comparisons, and common mistakes.";
+    flashcardData = await callGroqJSON(prompt, { mode: "compact", temperature: 0.25, max_tokens: 3000 });
+    if (!Array.isArray(flashcardData.cards)) throw new Error("Llama did not return a valid flashcard deck.");
+    saveCachedAI(cacheKey, flashcardData);
+    flashcardData.cards = flashcardData.cards.map(card => ({ ...card, flipped: false }));
+    flashCurrentIndex = 0;
+    renderFlashcardInterface();
+    setStatus("Interactive flashcards generated with Llama 3.1 8B Instant.");
+  } catch (err) {
+    document.getElementById("flashcardsOutput").innerHTML = '<div class="empty-state"><strong>Flashcards failed</strong><span>' + escapeHtml(err.message) + "</span></div>";
+    errorBox.innerText = "Flashcard generation failed:\n" + err.message;
+  } finally { button.disabled = false; setStudyAssistantReady(!!segments.length); }
+}
+
+async function generateMatchingGame() {
+  if (!ensureStudyAssistantReady()) return;
+  const count = document.getElementById("matchingCount").value;
+  const focus = document.getElementById("matchingFocus").value;
+  const button = document.getElementById("matchingBtn");
+  button.disabled = true;
+  showLoading("matchingOutput", "Generating 3D matching game…");
+  try {
+    const cacheKey = "matching:" + count + ":" + focus;
+    const cached = loadCachedAI(cacheKey);
+    if (cached) {
+      matchingData = prepareMatchingGame(cached);
+      matchingSelected = { concept: null, match: null };
+      matchingStats = { attempts: 0, streak: 0, bestStreak: 0, message: "Pick one concept and one definition to match them.", messageType: "" };
+      renderMatchingGame();
+      setStatus("Loaded cached matching game without using tokens.");
+      return;
+    }
+    const prompt = "Create a lecture matching game as JSON. Return a JSON object with keys: title, pairs. pairs must be an array of exactly " + count + " items. Each pair object must have: concept, match. Focus: " + focus + ". Make pairs exam-useful and specific to the lecture. Concepts should be short. Matches should be clear definitions, outcomes, roles, dates, causes, effects, or examples. Do not make silly or obvious pairs.";
+    const rawGame = await callGroqJSON(prompt, { mode: "compact", temperature: 0.25, max_tokens: 2600 });
+    if (!Array.isArray(rawGame.pairs)) throw new Error("Llama did not return a valid matching game.");
+    saveCachedAI(cacheKey, rawGame);
+    matchingData = prepareMatchingGame(rawGame);
+    matchingSelected = { concept: null, match: null };
+    matchingStats = { attempts: 0, streak: 0, bestStreak: 0, message: "Pick one concept and one definition to match them.", messageType: "" };
+    renderMatchingGame();
+    setStatus("3D matching game generated with Llama 3.1 8B Instant.");
+  } catch (err) {
+    document.getElementById("matchingOutput").innerHTML = '<div class="empty-state"><strong>Matching game failed</strong><span>' + escapeHtml(err.message) + "</span></div>";
+    errorBox.innerText = "Matching game generation failed:\n" + err.message;
+  } finally { button.disabled = false; setStudyAssistantReady(!!segments.length); }
+}
+
+function appendChatBubble(role, text) {
+  const wrap = document.getElementById("chatMessages");
+  const bubble = document.createElement("div");
+  bubble.className = "chat-bubble " + role;
+  bubble.innerHTML = '<div class="chat-meta">' + (role === "user" ? "You" : "Study Assistant") + "</div>" + formatAiHtml(text);
+  wrap.appendChild(bubble);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+async function askLectureQuestion() {
+  if (!ensureStudyAssistantReady()) return;
+  const input = document.getElementById("lectureQuestion");
+  const question = input.value.trim();
+  if (!question) return;
+  appendChatBubble("user", question);
+  input.value = "";
+  document.getElementById("chatStatus").textContent = "Thinking…";
+  const askBtn = document.getElementById("askBtn");
+  askBtn.disabled = true;
+  try {
+    const historyText = chatHistory.slice(-6).map(item => (item.role === "user" ? "User: " : "Assistant: ") + item.text).join("\n\n");
+    const prompt = "Answer the current user question as a lecture tutor. Rule: use the transcript as the main source, but you MAY use general historical/technical knowledge if the question is clearly connected to the lecture topic and helps the student understand it. Refuse only when the question is clearly unrelated to the lecture. If you use outside knowledge, say briefly that it is broader context. Mention timestamps when the answer is supported by transcript parts. Keep the answer direct and not too long.\n\n" + (historyText ? ("Recent conversation:\n" + historyText + "\n\n") : "") + "Current user question: " + question;
+    const result = await callGroqWithTranscript(prompt, { mode: "chat", question, temperature: 0.35, max_tokens: 1400 });
+    appendChatBubble("assistant", result);
+    chatHistory.push({ role: "user", text: question });
+    chatHistory.push({ role: "assistant", text: result });
+    if (chatHistory.length > 10) chatHistory = chatHistory.slice(chatHistory.length - 10);
+    document.getElementById("chatStatus").textContent = "Answer ready.";
+    setStatus("Lecture question answered with Llama 3.1 8B Instant.");
+  } catch (err) {
+    appendChatBubble("assistant", "I could not answer that question.\n\n" + err.message);
+    document.getElementById("chatStatus").textContent = "Question failed.";
+    errorBox.innerText = "Lecture chat failed:\n" + err.message;
+  } finally { askBtn.disabled = false; setStudyAssistantReady(!!segments.length); }
+}
+
+function clearLectureChat() {
+  chatHistory = [];
+  document.getElementById("chatMessages").innerHTML = '<div class="chat-bubble assistant"><div class="chat-meta">Study Assistant</div>Once your transcript is ready, ask about the lecture or its wider topic.</div>';
+  document.getElementById("chatStatus").textContent = segments.length ? "Transcript ready. Ask about the lecture or its wider topic." : "Ready after transcript is finished.";
+}
+
+
+function getSavedLectureIds() {
+  try { return JSON.parse(localStorage.getItem("lectureNoteStudio.savedLectureIds") || "[]"); }
+  catch (e) { return []; }
+}
+
+function setSavedLectureIds(ids) {
+  localStorage.setItem("lectureNoteStudio.savedLectureIds", JSON.stringify([...new Set(ids)]));
+}
+
+function lectureStorageKey(id) {
+  return "lectureNoteStudio.savedLecture." + id;
+}
+
+function makeLectureId() {
+  return "lec_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+}
+
+function collectCurrentLectureState() {
+  const title = getLectureTitle() || "Untitled lecture";
+  return {
+    id: currentSavedLectureId || makeLectureId(),
+    title,
+    savedAt: new Date().toISOString(),
+    mediaPath: selectedMediaPath || "",
+    mediaKind: currentMediaKind || "",
+    currentTime: getCurrentPlayer() ? getCurrentPlayer().currentTime || 0 : 0,
+    transcriptPlainText: transcriptPlainText || "",
+    segments: segments || [],
+    bookmarks: transcriptBookmarks || [],
+    summaryHtml: document.getElementById("summaryOutput")?.innerHTML || "",
+    quizData,
+    quizUserAnswers,
+    quizCurrentIndex,
+    flashcardData,
+    flashCurrentIndex,
+    matchingData,
+    matchingSelected,
+    matchingStats,
+    chatHistory,
+    chatHtml: document.getElementById("chatMessages")?.innerHTML || "",
+    stats: {
+      model: document.getElementById("modelStat")?.textContent || "",
+      segment: document.getElementById("segmentStat")?.textContent || "",
+      finished: document.getElementById("finishedStat")?.textContent || ""
+    }
+  };
+}
+
+function saveCurrentLectureToLibrary() {
+  try {
+    const lecture = collectCurrentLectureState();
+
+    // Always allow saving, even before transcription. This lets the user save only a title/media first.
+    if (!lecture.title || lecture.title === "Untitled lecture") {
+      const entered = prompt("Lecture title:", lecture.title || "Untitled lecture");
+      if (!entered) return;
+      lecture.title = entered.trim() || "Untitled lecture";
+      setLectureTitle(lecture.title);
+    }
+
+    // Keep saved data smaller and safer for localStorage.
+    // HTML outputs are kept, but if localStorage is full we retry with lighter versions.
+    currentSavedLectureId = lecture.id;
+
+    try {
+      localStorage.setItem(lectureStorageKey(lecture.id), JSON.stringify(lecture));
+    } catch (storageErr) {
+      const lighterLecture = {
+        ...lecture,
+        chatHtml: "",
+        summaryHtml: lecture.summaryHtml || "",
+        transcriptPlainText: lecture.transcriptPlainText || (lecture.segments || []).map(s => "[" + s.time + "] " + s.text).join("\n")
+      };
+      localStorage.setItem(lectureStorageKey(lecture.id), JSON.stringify(lighterLecture));
+    }
+
+    const ids = getSavedLectureIds();
+    if (!ids.includes(lecture.id)) ids.unshift(lecture.id);
+    setSavedLectureIds(ids);
+
+    renderLectureLibrary();
+    updateLectureTitleDisplay();
+    setStatus("✅ Saved lecture: " + escapeHtml(lecture.title));
+
+    const saveMsg = document.getElementById("librarySaveMessage");
+    if (saveMsg) {
+      saveMsg.innerHTML = "✅ Saved: <strong>" + escapeHtml(lecture.title) + "</strong>";
+      saveMsg.style.display = "block";
+    }
+
+    // Show the saved lecture immediately so the user can confirm it worked.
+    if (document.getElementById("view-library")) {
+      setView("view-library");
+    }
+  } catch (err) {
+    console.error("Save lecture failed:", err);
+    alert("Save failed: " + (err && err.message ? err.message : err));
+    setStatus("Save failed. Check console for details.");
+  }
+}
+
+function readSavedLecture(id) {
+  try { return JSON.parse(localStorage.getItem(lectureStorageKey(id)) || "null"); }
+  catch (e) { return null; }
+}
+
+function renderLectureLibrary() {
+  const list = document.getElementById("lectureLibraryList");
+  const titleInput = document.getElementById("libraryTitleInput");
+  if (titleInput) titleInput.value = getLectureTitle() || "";
+  if (!list) return;
+  const ids = getSavedLectureIds();
+  const lectures = ids.map(readSavedLecture).filter(Boolean);
+  if (!lectures.length) {
+    list.innerHTML = '<div class="empty-state"><strong>No saved lectures yet</strong><span>Your lecture will appear here automatically after you choose or record media.</span></div>';
+    return;
+  }
+  list.innerHTML = lectures.map(lec => {
+    const savedDate = lec.savedAt ? new Date(lec.savedAt).toLocaleString() : "Unknown date";
+    const qCount = lec.quizData?.questions?.length || 0;
+    const fCount = lec.flashcardData?.cards?.length || 0;
+    const mCount = lec.matchingData?.pairs?.length || 0;
+    const bCount = lec.bookmarks?.length || 0;
+    const segCount = lec.segments?.length || 0;
+    return '<div class="library-card">' +
+      '<div>' +
+        '<div class="library-title">' + escapeHtml(lec.title || "Untitled lecture") + '</div>' +
+        '<div class="library-meta">' +
+          '<span>Saved: ' + escapeHtml(savedDate) + '</span>' +
+          '<span>Segments: ' + segCount + '</span>' +
+          '<span>Bookmarks: ' + bCount + '</span>' +
+          '<span>Quiz: ' + qCount + '</span>' +
+          '<span>Flashcards: ' + fCount + '</span>' +
+          '<span>Matching: ' + mCount + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="library-actions">' +
+        '<button class="btn btn-teal btn-sm" onclick="loadSavedLecture(\'' + lec.id + '\')">Open</button>' +
+        '<button class="btn btn-red btn-sm" onclick="deleteSavedLecture(\'' + lec.id + '\')">Delete</button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+
+function loadSavedLecture(id) {
+  const lec = readSavedLecture(id);
+  if (!lec) { alert("Lecture not found."); renderLectureLibrary(); return; }
+  currentSavedLectureId = lec.id;
+  selectedMediaPath = lec.mediaPath || "";
+  currentMediaKind = lec.mediaKind || (selectedMediaPath ? (isVideo(selectedMediaPath) ? "video" : "audio") : "");
+  segments = Array.isArray(lec.segments) ? lec.segments : [];
+  transcriptBookmarks = Array.isArray(lec.bookmarks) ? lec.bookmarks : [];
+  transcriptPlainText = lec.transcriptPlainText || segments.map(s => `[${s.time}] ${s.text}`).join("\n");
+  quizData = lec.quizData || null;
+  quizUserAnswers = lec.quizUserAnswers || {};
+  quizCurrentIndex = lec.quizCurrentIndex || 0;
+  flashcardData = lec.flashcardData || null;
+  flashCurrentIndex = lec.flashCurrentIndex || 0;
+  matchingData = lec.matchingData || null;
+  if (matchingData?.pairs?.length) matchingData = prepareMatchingGame(matchingData);
+  matchingSelected = lec.matchingSelected || { concept: null, match: null };
+  matchingStats = lec.matchingStats || { attempts: 0, streak: 0, bestStreak: 0, message: "Pick one concept and one definition to match them.", messageType: "" };
+  chatHistory = Array.isArray(lec.chatHistory) ? lec.chatHistory : [];
+  setLectureTitle(lec.title || titleFromPath(selectedMediaPath));
+  if (selectedMediaPath) {
+    try { setPlayer(selectedMediaPath, currentMediaKind); } catch(e) {}
+  }
+  renderTranscript(segments);
+  renderBookmarks();
+  document.getElementById("summaryOutput").innerHTML = lec.summaryHtml || '<div class="empty-state"><strong>No summary saved</strong><span>Generate a summary for this lecture.</span></div>';
+  if (quizData?.questions?.length) renderQuizInterface();
+  else document.getElementById("quizOutput").innerHTML = '<div class="empty-state"><strong>No quiz saved</strong><span>Generate a quiz for this lecture.</span></div>';
+  if (flashcardData?.cards?.length) renderFlashcardInterface();
+  else document.getElementById("flashcardsOutput").innerHTML = '<div class="empty-state"><strong>No flashcards saved</strong><span>Generate flashcards for this lecture.</span></div>';
+  if (matchingData?.pairs?.length) renderMatchingGame();
+  else if (document.getElementById("matchingOutput")) document.getElementById("matchingOutput").innerHTML = '<div class="empty-state"><strong>No matching game saved</strong><span>Generate a matching game for this lecture.</span></div>';
+  document.getElementById("chatMessages").innerHTML = lec.chatHtml || '<div class="chat-bubble assistant"><div class="chat-meta">Study Assistant</div>Saved lecture loaded. Ask about this lecture or its wider topic.</div>';
+  document.getElementById("segmentStat").innerText = "Segments: " + segments.length;
+  if (lec.stats?.model) document.getElementById("modelStat").innerText = lec.stats.model;
+  if (lec.stats?.finished) document.getElementById("finishedStat").innerText = lec.stats.finished;
+  setStudyAssistantReady(!!segments.length);
+  setView("view-transcript");
+  setStatus("Loaded saved lecture: " + escapeHtml(lec.title || "Untitled lecture"));
+  setTimeout(() => {
+    const player = getCurrentPlayer();
+    if (player && lec.currentTime) player.currentTime = lec.currentTime;
+  }, 250);
+}
+
+function deleteSavedLecture(id) {
+  const lec = readSavedLecture(id);
+  if (!confirm("Delete saved lecture" + (lec?.title ? (": " + lec.title) : "") + "?")) return;
+  localStorage.removeItem(lectureStorageKey(id));
+  setSavedLectureIds(getSavedLectureIds().filter(x => x !== id));
+  if (currentSavedLectureId === id) currentSavedLectureId = "";
+  renderLectureLibrary();
+  setStatus("Saved lecture deleted.");
+}
+
+function deleteAllSavedLectures() {
+  const ids = getSavedLectureIds();
+  if (!ids.length) return;
+  if (!confirm("Delete ALL saved lectures? This cannot be undone.")) return;
+  ids.forEach(id => localStorage.removeItem(lectureStorageKey(id)));
+  setSavedLectureIds([]);
+  currentSavedLectureId = "";
+  renderLectureLibrary();
+  setStatus("All saved lectures deleted.");
+}
+
+function syncLibraryTitleToMain(value) {
+  updateLectureTitle(value);
+}
+
+function copyTranscript() {
+  if (!segments.length) { alert("No transcript to copy."); return; }
+  const text = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
+  clipboard.writeText(text);
+  setStatus("Transcript copied to clipboard.");
+}
+
+async function saveTranscriptTxt() {
+  if (!segments.length) { alert("No transcript to save."); return; }
+  const text = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
+  const saved = await ipcRenderer.invoke("save-transcript", { defaultName: sanitizeFileName(getLectureTitle()) + "-transcript.txt", content: text });
+  if (saved) setStatus("Transcript saved: " + saved);
+}
+
+async function saveTranscriptJson() {
+  if (!segments.length) { alert("No transcript to save."); return; }
+  const saved = await ipcRenderer.invoke("save-transcript", { defaultName: sanitizeFileName(getLectureTitle()) + "-transcript.json", content: JSON.stringify({ title: getLectureTitle(), source: selectedMediaPath, createdAt: new Date().toISOString(), segments }, null, 2) });
+  if (saved) setStatus("JSON transcript saved: " + saved);
+}
+
+function emptyState(title, subtitle) {
+  return '<div class="empty-state"><strong>' + escapeHtml(title) + "</strong><span>" + escapeHtml(subtitle) + "</span></div>";
+}
+
+function highlightText(text, query) {
+  if (!query) return text;
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return text.replace(new RegExp("(" + escapedQuery + ")", "gi"), "<mark>$1</mark>");
+}
+
+function escapeHtml(text) {
+  return String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+
+/* ==============================
+   AUTO-SAVE LECTURE LIBRARY SYSTEM
+   Saves title, media, transcript, bookmarks, summary, quiz, flashcards,
+   chat/questions, and playback position automatically.
+   ============================== */
+let autoSaveTimer = null;
+let autoSaveBusy = false;
+let autoSaveSuppressed = false;
+let autoSaveLastSignature = "";
+
+function ensureCurrentLectureId() {
+  if (!currentSavedLectureId) currentSavedLectureId = makeLectureId();
+  return currentSavedLectureId;
+}
+
+function setAutoSaveIndicator(state, detail) {
+  const msg = document.getElementById("librarySaveMessage");
+  if (!msg) return;
+  const title = escapeHtml(getLectureTitle() || "Untitled lecture");
+  if (state === "saving") {
+    msg.innerHTML = "💾 Saving <strong>" + title + "</strong>…";
+  } else if (state === "saved") {
+    msg.innerHTML = "✅ Auto-saved <strong>" + title + "</strong>" + (detail ? " <span>" + escapeHtml(detail) + "</span>" : "");
+  } else if (state === "failed") {
+    msg.innerHTML = "⚠️ Auto-save failed" + (detail ? ": " + escapeHtml(detail) : "");
+  }
+  msg.style.display = "block";
+}
+
+function makeAutoSaveSignature(lecture) {
+  return JSON.stringify({
+    id: lecture.id,
+    title: lecture.title,
+    mediaPath: lecture.mediaPath,
+    mediaKind: lecture.mediaKind,
+    currentTime: Math.floor(Number(lecture.currentTime || 0)),
+    segments: (lecture.segments || []).length,
+    transcriptHash: hashText((lecture.transcriptPlainText || "").slice(0, 5000)),
+    bookmarks: (lecture.bookmarks || []).map(b => [Math.floor(Number(b.seconds || 0)), b.note]).join("|"),
+    quizHash: hashText(JSON.stringify(lecture.quizData || {}).slice(0, 5000) + JSON.stringify(lecture.quizUserAnswers || {})),
+    flashHash: hashText(JSON.stringify(lecture.flashcardData || {}).slice(0, 5000)),
+    chatHash: hashText(JSON.stringify(lecture.chatHistory || {}).slice(0, 5000)),
+    summaryHash: hashText((lecture.summaryHtml || "").slice(0, 5000))
+  });
+}
+
+function autoSaveCurrentLecture(reason) {
+  if (autoSaveSuppressed || autoSaveBusy) return;
+
+  // Do not create useless empty saved lectures before user chooses/records anything or types a real title.
+  const hasAnyLectureData = !!selectedMediaPath || segments.length > 0 || transcriptPlainText.trim() || quizData || flashcardData || matchingData || chatHistory.length || transcriptBookmarks.length || (getLectureTitle() && getLectureTitle() !== "Untitled lecture");
+  if (!hasAnyLectureData) return;
+
+  try {
+    autoSaveBusy = true;
+    ensureCurrentLectureId();
+    const lecture = collectCurrentLectureState();
+    lecture.id = currentSavedLectureId;
+    lecture.savedAt = new Date().toISOString();
+    lecture.autoSaved = true;
+
+    const signature = makeAutoSaveSignature(lecture);
+    if (signature === autoSaveLastSignature) return;
+    autoSaveLastSignature = signature;
+
+    setAutoSaveIndicator("saving");
+
+    try {
+      localStorage.setItem(lectureStorageKey(lecture.id), JSON.stringify(lecture));
+    } catch (storageErr) {
+      const lighterLecture = {
+        ...lecture,
+        chatHtml: "",
+        summaryHtml: lecture.summaryHtml || "",
+        transcriptPlainText: lecture.transcriptPlainText || (lecture.segments || []).map(s => "[" + s.time + "] " + s.text).join("\n")
+      };
+      localStorage.setItem(lectureStorageKey(lecture.id), JSON.stringify(lighterLecture));
+    }
+
+    const ids = getSavedLectureIds();
+    if (!ids.includes(lecture.id)) ids.unshift(lecture.id);
+    setSavedLectureIds(ids);
+    renderLectureLibrary();
+    setAutoSaveIndicator("saved", reason || "");
+  } catch (err) {
+    console.error("Auto-save failed:", err);
+    setAutoSaveIndicator("failed", err && err.message ? err.message : String(err));
+  } finally {
+    autoSaveBusy = false;
+  }
+}
+
+function triggerAutoSave(reason, delay = 700) {
+  if (autoSaveSuppressed) return;
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => autoSaveCurrentLecture(reason), delay);
+}
+
+function wrapForAutoSave(functionName, reason, delay = 700) {
+  const original = window[functionName];
+  if (typeof original !== "function") return;
+  window[functionName] = function(...args) {
+    const result = original.apply(this, args);
+    if (result && typeof result.then === "function") {
+      return result.finally(() => triggerAutoSave(reason, delay));
+    }
+    triggerAutoSave(reason, delay);
+    return result;
+  };
+}
+
+function installAutoSaveHooks() {
+  const titleInput = document.getElementById("lectureTitleInput");
+  if (titleInput) titleInput.addEventListener("input", () => triggerAutoSave("title updated", 500));
+  const libraryTitleInput = document.getElementById("libraryTitleInput");
+  if (libraryTitleInput) libraryTitleInput.addEventListener("input", () => triggerAutoSave("title updated", 500));
+
+  [audioPlayer, videoPlayer].forEach(player => {
+    if (!player) return;
+    player.addEventListener("pause", () => triggerAutoSave("playback position saved", 1200));
+    player.addEventListener("timeupdate", () => triggerAutoSave("playback position saved", 5000));
+    player.addEventListener("volumechange", () => triggerAutoSave("volume updated", 1500));
+  });
+
+  [
+    ["chooseMedia", "media selected", 400],
+    ["setLectureTitle", "title updated", 500],
+    ["updateLectureTitle", "title updated", 500],
+    ["saveTranscriptSegmentEdit", "transcript edited", 500],
+    ["addBookmark", "bookmark added", 400],
+    ["deleteBookmark", "bookmark deleted", 400],
+    ["clearBookmarks", "bookmarks cleared", 400],
+    ["generateSummary", "summary generated", 500],
+    ["generateQuiz", "quiz generated", 500],
+    ["generateFlashcards", "flashcards generated", 500],
+    ["selectQuizOption", "quiz answer saved", 500],
+    ["setQuizTextAnswer", "quiz answer saved", 900],
+    ["resetCurrentQuizAnswer", "quiz answer reset", 500],
+    ["toggleQuizAnswer", "quiz progress saved", 600],
+    ["changeQuizQuestion", "quiz progress saved", 900],
+    ["goToQuizQuestion", "quiz progress saved", 900],
+    ["flipCurrentFlashcard", "flashcard progress saved", 700],
+    ["changeFlashcard", "flashcard progress saved", 900],
+    ["goToFlashcard", "flashcard progress saved", 900],
+    ["shuffleFlashcards", "flashcards shuffled", 500],
+    ["resetFlashcards", "flashcards reset", 500],
+    ["selectMatchingCard", "matching progress saved", 500],
+    ["shuffleMatchingBoard", "matching board shuffled", 500],
+    ["resetMatchingGame", "matching game reset", 500],
+    ["askLectureQuestion", "chat saved", 500],
+    ["clearLectureChat", "chat cleared", 500]
+  ].forEach(([name, reason, delay]) => wrapForAutoSave(name, reason, delay));
+
+  // Wrap renderTranscript so finished transcription and loaded/edited transcripts are saved.
+  const originalRenderTranscript = window.renderTranscript;
+  if (typeof originalRenderTranscript === "function") {
+    window.renderTranscript = function(...args) {
+      const result = originalRenderTranscript.apply(this, args);
+      refreshTranscriptPlainText();
+      triggerAutoSave("transcript updated", 700);
+      return result;
+    };
+  }
+
+  // Make manual save still work, but keep user on current screen instead of forcing library view.
+  const originalManualSave = window.saveCurrentLectureToLibrary;
+  if (typeof originalManualSave === "function") {
+    window.saveCurrentLectureToLibrary = function() {
+      autoSaveCurrentLecture("manual save");
+      setStatus("✅ Saved lecture: " + escapeHtml(getLectureTitle() || "Untitled lecture"));
+    };
+  }
+}
+
+transcriptPanel.addEventListener("scroll", () => {
+  userIsManuallyScrollingTranscript = true;
+  clearTimeout(manualScrollTimer);
+  manualScrollTimer = setTimeout(() => { userIsManuallyScrollingTranscript = false; }, 2500);
+}, { passive: true });
+
+setRecordingControls(false, false);
+setView("view-capture");
+setStudyTab("tab-summary");
+
+document.getElementById("lectureQuestion").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); askLectureQuestion(); }
+});
+
+document.getElementById("modelSelect").addEventListener("change", () => {
+  document.getElementById("modelStat").innerText = "Model: " + document.getElementById("modelSelect").value;
+});
+
+const syncMirrorStats = () => {
+  [["fileStat","fileStatClone"],["modelStat","modelStatClone"],["segmentStat","segmentStatClone"],["finishedStat","finishedStatClone"]].forEach(([src, dst]) => {
+    const s = document.getElementById(src);
+    const d = document.getElementById(dst);
+    if (s && d) d.textContent = s.textContent;
+  });
+};
+setInterval(syncMirrorStats, 400);
+syncMirrorStats();
+syncVolumeUi();
+renderLectureLibrary();
+installAutoSaveHooks();
+triggerAutoSave("initialized", 1200);
+
+function isTypingInField(event) {
+  const tag = (event.target && event.target.tagName || "").toLowerCase();
+  return tag === "input" || tag === "textarea" || tag === "select" || event.target.isContentEditable;
+}
+
+document.addEventListener("keydown", event => {
+  if (isTypingInField(event)) return;
+  const key = event.key.toLowerCase();
+  if (event.code === "Space") { event.preventDefault(); togglePlayback(); }
+  else if (key === "s") { event.preventDefault(); stopPlayback(); }
+  else if (key === "b") { event.preventDefault(); addBookmarkAtCurrentTime(); }
+  else if (key === "e") { event.preventDefault(); editActiveTranscriptSegment(); }
+  else if (event.key === "ArrowRight") { event.preventDefault(); seekRelative(10); }
+  else if (event.key === "ArrowLeft") { event.preventDefault(); seekRelative(-10); }
+  else if (event.key === "ArrowUp") { event.preventDefault(); volumeRelative(0.1); }
+  else if (event.key === "ArrowDown") { event.preventDefault(); volumeRelative(-0.1); }
+});
+
+  window.addEventListener("DOMContentLoaded", loadGroqKey);
+</script>
+</body>
+</html>
