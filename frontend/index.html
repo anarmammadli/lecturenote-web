@@ -1991,9 +1991,13 @@
   </div><!-- /app-shell -->
 
   <script>
-const { ipcRenderer, clipboard } = require("electron");
-const { spawn, execFile } = require("child_process");
-const path = require("path");
+// Web version: no Electron/Node APIs.
+// Put your Railway backend URL here after deployment.
+const API_BASE = "https://lecturenote-web-production-4f04.up.railway.app";
+
+let selectedMediaFile = null;
+let selectedMediaUrl = "";
+let currentTranscriptionController = null;
 
 let selectedMediaPath = "";
 let currentMediaKind = "";
@@ -2002,7 +2006,7 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let onlineRecordingMode = "audio";
 let voiceRecordingMode = "audio";
-let currentProcess = null;
+let currentProcess = null; // true while web transcription request is running
 let timerInterval = null;
 let processStartedAt = null;
 let lastElapsedText = "00:00";
@@ -2165,28 +2169,40 @@ function stopTimer(finalLabel) {
 }
 
 async function chooseMedia() {
-  const filePath = await ipcRenderer.invoke("choose-media");
-  if (!filePath) return;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "audio/*,video/*,.mp3,.wav,.m4a,.aac,.flac,.ogg,.opus,.wma,.mp4,.mov,.mkv,.webm,.avi,.m4v,.wmv";
 
-  selectedMediaPath = filePath;
-  currentSavedLectureId = "";
-  segments = [];
-  activeSegmentIndex = -1;
-  setStudyAssistantReady(false);
-  resetStudyAssistantOutputs();
+  input.onchange = () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
 
-  setPlayer(filePath, isVideo(filePath) ? "video" : "audio");
-  loadBookmarks();
+    selectedMediaFile = file;
+    selectedMediaPath = file.name;
+    if (selectedMediaUrl) URL.revokeObjectURL(selectedMediaUrl);
+    selectedMediaUrl = URL.createObjectURL(file);
 
-  transcriptPanel.innerHTML = '<div class="empty-state"><strong>Ready to transcribe</strong><span>Press Transcribe to generate timestamped notes.</span></div>';
-  setLectureTitle(titleFromPath(filePath));
-  document.getElementById("segmentStat").innerText = "Segments: 0";
-  document.getElementById("finishedStat").innerText = "Finished: —";
-  setStatus("Selected: " + getLectureTitle());
-  errorBox.innerText = "";
-  resetSteps();
-  setState("Idle");
-  resetStudyAssistant();
+    currentSavedLectureId = "";
+    segments = [];
+    activeSegmentIndex = -1;
+    setStudyAssistantReady(false);
+    resetStudyAssistantOutputs();
+
+    setPlayer(selectedMediaUrl, isVideo(file.name) ? "video" : "audio");
+    loadBookmarks();
+
+    transcriptPanel.innerHTML = '<div class="empty-state"><strong>Ready to transcribe</strong><span>Press Transcribe to generate timestamped notes.</span></div>';
+    setLectureTitle(titleFromPath(file.name));
+    document.getElementById("segmentStat").innerText = "Segments: 0";
+    document.getElementById("finishedStat").innerText = "Finished: —";
+    setStatus("Selected: " + getLectureTitle());
+    errorBox.innerText = "";
+    resetSteps();
+    setState("Idle");
+    resetStudyAssistant();
+  };
+
+  input.click();
 }
 
 function setPlayer(filePath, mediaKind) {
@@ -2264,22 +2280,23 @@ function setupRecorder(stream, recordingType, preferredType) {
   mediaRecorder.onresume = () => { setRecordingControls(true, false); setStatus("Recording resumed."); };
   mediaRecorder.onstop = async () => {
     const blob = new Blob(recordedChunks, { type: mimeType });
-    const arrayBuffer = await blob.arrayBuffer();
-    const uint8 = Array.from(new Uint8Array(arrayBuffer));
-    const saveResult = await ipcRenderer.invoke("save-recording", uint8);
-    const savedPath = typeof saveResult === "string" ? saveResult : saveResult.filePath;
+    const fileName = `lecture-recording-${Date.now()}.webm`;
 
-    selectedMediaPath = savedPath;
+    selectedMediaFile = new File([blob], fileName, { type: mimeType });
+    selectedMediaPath = fileName;
+    if (selectedMediaUrl) URL.revokeObjectURL(selectedMediaUrl);
+    selectedMediaUrl = URL.createObjectURL(blob);
+
     segments = [];
     activeSegmentIndex = -1;
-    setPlayer(savedPath, preferredType);
+    setPlayer(selectedMediaUrl, preferredType);
     loadBookmarks();
 
     setLectureTitle("Lecture Recording " + new Date().toLocaleString());
     document.getElementById("segmentStat").innerText = "Segments: 0";
     document.getElementById("finishedStat").innerText = "Finished: —";
-    transcriptPanel.innerHTML = '<div class="empty-state"><strong>Recording saved</strong><span>Press Transcribe to process your recording.</span></div>';
-    setStatus("Recording saved: " + getLectureTitle());
+    transcriptPanel.innerHTML = '<div class="empty-state"><strong>Recording ready</strong><span>Press Transcribe to process your recording.</span></div>';
+    setStatus("Recording ready: " + getLectureTitle());
     resetSteps();
     setState("Idle");
     resetStudyAssistant();
@@ -2418,12 +2435,11 @@ function stopRecording() {
   setRecordingControls(false, false);
 }
 
-function transcribe() {
-  if (!selectedMediaPath) { alert("Choose or record audio/video first."); return; }
+async function transcribe() {
+  if (!selectedMediaFile) { alert("Choose or record audio/video first."); return; }
   if (currentProcess) { alert("A transcription is already running."); return; }
 
   const model = document.getElementById("modelSelect").value;
-  const scriptPath = path.join(__dirname, "transcribe.py");
 
   document.getElementById("transcribeBtn").disabled = true;
   document.getElementById("cancelBtn").disabled = false;
@@ -2437,83 +2453,68 @@ function transcribe() {
   setState("Processing");
   resetSteps();
   startTimer();
-  setStatus("Starting transcription with Whisper " + model + "…");
+  setStatus("Uploading media to backend and starting Whisper " + model + "…");
   transcriptPanel.innerHTML = '<div class="empty-state"><strong>Processing…</strong><span>Please wait while the transcript is generated.</span></div>';
 
-  let stdout = "";
-  let stderr = "";
-  let wasCancelled = false;
+  currentProcess = true;
+  currentTranscriptionController = new AbortController();
 
-  currentProcess = spawn("python", [scriptPath, selectedMediaPath, model], { windowsHide: true });
-  currentProcess.stdout.on("data", data => { stdout += data.toString(); });
-  currentProcess.stderr.on("data", data => {
-    const chunk = data.toString();
-    stderr += chunk;
-    if (chunk.includes("STEP:CONVERT")) { setStep("convert", "Running"); setStatus("Converting media to clean audio…"); }
-    if (chunk.includes("STEP:LOAD_MODEL")) { setStep("load", "Running"); setStatus("Loading Whisper model…"); }
-    if (chunk.includes("STEP:TRANSCRIBE")) { setStep("transcribe", "Running"); setStatus("Transcribing speech…"); }
-    if (chunk.includes("STEP:RENDER")) { setStep("render", "Running"); setStatus("Rendering transcript…"); }
-  });
-  currentProcess.on("error", err => {
-    currentProcess = null;
-    document.getElementById("transcribeBtn").disabled = false;
-    document.getElementById("cancelBtn").disabled = true;
-    stopTimer("Failed after");
-    setState("Failed");
-    errorBox.innerText = "Could not start Python:\n" + err.message;
-    setStatus("Failed.");
-  });
-  currentProcess.on("close", code => {
-    currentProcess = null;
-    document.getElementById("transcribeBtn").disabled = false;
-    document.getElementById("cancelBtn").disabled = true;
-    if (wasCancelled) return;
-    if (code !== 0 && !stdout.trim()) {
-      stopTimer("Failed after"); setState("Failed");
-      errorBox.innerText = "Process failed with code " + code + "\n\n" + stderr;
-      setStatus("Failed."); return;
-    }
+  try {
+    setStep("convert", "Uploading");
+    const formData = new FormData();
+    formData.append("file", selectedMediaFile, selectedMediaFile.name || "lecture.webm");
+    formData.append("model", model);
+
+    setStep("load", "Running");
+    setStatus("Backend received file. Loading Whisper model…");
+
+    const response = await fetch(API_BASE + "/transcribe", {
+      method: "POST",
+      body: formData,
+      signal: currentTranscriptionController.signal
+    });
+
+    setStep("transcribe", "Running");
     let data;
-    try { data = JSON.parse(stdout); } catch {
-      stopTimer("Failed after"); setState("Failed");
-      errorBox.innerText = "Invalid Python output:\n\n" + stdout + "\n\n" + stderr;
-      setStatus("Failed."); return;
-    }
-    if (!data.ok) {
-      stopTimer("Failed after"); setState("Failed");
-      errorBox.innerText = data.error; setStatus("Failed."); return;
-    }
+    try { data = await response.json(); }
+    catch { throw new Error("Backend did not return JSON. Check Railway logs."); }
+
+    if (!response.ok || !data.ok) throw new Error(data.error || ("Backend error: HTTP " + response.status));
+
     setStep("render", "Running");
     segments = data.segments || [];
     renderTranscript(segments);
     finishSteps();
     stopTimer("Finished in");
-    document.getElementById("modelStat").innerText = "Model: " + data.model;
+    document.getElementById("modelStat").innerText = "Model: " + (data.model || model);
     document.getElementById("segmentStat").innerText = "Segments: " + segments.length;
     setState("Completed");
-    setStatus("Done. Language: " + data.language + " · Segments: " + segments.length);
+    setStatus("Done. Language: " + (data.language || "unknown") + " · Segments: " + segments.length);
     transcriptPlainText = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
     setStudyAssistantReady(true);
-  });
-  window.__cancelCurrentTranscription = () => { wasCancelled = true; };
+  } catch (err) {
+    if (err.name === "AbortError") {
+      stopTimer("Stopped after");
+      setState("Stopped");
+      setStatus("Transcription stopped by user.");
+      setProgress(0);
+    } else {
+      stopTimer("Failed after");
+      setState("Failed");
+      errorBox.innerText = err.message;
+      setStatus("Failed.");
+    }
+  } finally {
+    currentProcess = null;
+    currentTranscriptionController = null;
+    document.getElementById("transcribeBtn").disabled = false;
+    document.getElementById("cancelBtn").disabled = true;
+  }
 }
 
 function cancelTranscription() {
   if (!currentProcess) return;
-  const pid = currentProcess.pid;
-  window.__cancelCurrentTranscription && window.__cancelCurrentTranscription();
-  if (process.platform === "win32") {
-    execFile("taskkill", ["/pid", String(pid), "/f", "/t"], () => {});
-  } else {
-    currentProcess.kill("SIGTERM");
-  }
-  currentProcess = null;
-  document.getElementById("transcribeBtn").disabled = false;
-  document.getElementById("cancelBtn").disabled = true;
-  stopTimer("Stopped after");
-  setState("Stopped");
-  setStatus("Transcription stopped by user.");
-  setProgress(0);
+  if (currentTranscriptionController) currentTranscriptionController.abort();
 }
 
 function renderTranscript(list) {
@@ -3699,21 +3700,37 @@ function syncLibraryTitleToMain(value) {
 function copyTranscript() {
   if (!segments.length) { alert("No transcript to copy."); return; }
   const text = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
-  clipboard.writeText(text);
-  setStatus("Transcript copied to clipboard.");
+  navigator.clipboard.writeText(text).then(() => {
+    setStatus("Transcript copied to clipboard.");
+  }).catch(() => {
+    alert("Clipboard permission was blocked by the browser.");
+  });
 }
 
 async function saveTranscriptTxt() {
   if (!segments.length) { alert("No transcript to save."); return; }
   const text = segments.map(s => "[" + s.time + "] " + s.text).join("\n");
-  const saved = await ipcRenderer.invoke("save-transcript", { defaultName: sanitizeFileName(getLectureTitle()) + "-transcript.txt", content: text });
-  if (saved) setStatus("Transcript saved: " + saved);
+  downloadTextFile(sanitizeFileName(getLectureTitle()) + "-transcript.txt", text, "text/plain;charset=utf-8");
+  setStatus("Transcript downloaded as TXT.");
 }
 
 async function saveTranscriptJson() {
   if (!segments.length) { alert("No transcript to save."); return; }
-  const saved = await ipcRenderer.invoke("save-transcript", { defaultName: sanitizeFileName(getLectureTitle()) + "-transcript.json", content: JSON.stringify({ title: getLectureTitle(), source: selectedMediaPath, createdAt: new Date().toISOString(), segments }, null, 2) });
-  if (saved) setStatus("JSON transcript saved: " + saved);
+  const content = JSON.stringify({ title: getLectureTitle(), source: selectedMediaPath, createdAt: new Date().toISOString(), segments }, null, 2);
+  downloadTextFile(sanitizeFileName(getLectureTitle()) + "-transcript.json", content, "application/json;charset=utf-8");
+  setStatus("Transcript downloaded as JSON.");
+}
+
+function downloadTextFile(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType || "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function emptyState(title, subtitle) {
